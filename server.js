@@ -1,41 +1,40 @@
 var express = require('express');
 var mongodb = require('mongodb');
 var mongoose = require('mongoose');
-var passport = require('passport');
 var _und = require('underscore-node');
 
 //DATABASE
 mongoose.connect(process.env.MONGOLAB_URI)
-var db - mongoose.connection;
+var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function(callback){
-	var userSchema = mongoose.Schema({
-		name: String,
-		password: String,
-		email: String,
-		county:String
-	});
-
-	var User = mongoose.model('User', userSchema);
-	var testUser = new User({name: "test", password: "secret", email: "h@mail.com", county: "Alameda"})
-	userSchema.methods.validPassword =function(guess){
-		var isValid = (guess === this.password);
-		console.log("password is valid?" + isValid);
-		return isValid;
-	}
+	
 })
 
-//SERVER
+//APP basics
 var app = express();
-app.set('port', (process.env.PORT || 5005));
-app.use(express.static(__dirname + '/public'));
+//use ejs as view engine, so view files are ejs
+app.set('view engine', 'ejs');
 
-//routes
-app.get('/', function(request, response) {
-  response.send('Hello World!');
-});
-app.post('/login', passport.authenticate('local', {successRedirect: '/', failureRedirect:'/login'}));
 
+//PASSPORT
+var passport = require('passport');
+var expressSession = require('express-session');
+app.use(expressSession({secret: 'mySecretKey'})); //learn more about mySecretKey
+app.use(passport.initialize());
+app.use(passport.session());
+
+var flash = require('connect-flash');
+app.use(flash());
+
+var initPassport = require('./passport/init');
+initPassport(passport);
+
+var routes = require('./routes/index')(passport);
+app.use('/', routes);
+
+//MAKE AVAILABLE
+app.set('port', (process.env.PORT || 5000));
 app.listen(app.get('port'), function() {
   console.log("Node app is running at localhost:" + app.get('port'));
 });

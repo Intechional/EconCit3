@@ -1,0 +1,27 @@
+<html lang="en">
+<head>
+    <% include ../partials/head %>
+</head>
+<body class="container">
+
+
+
+    <div>
+        <h1>Welcome. Is this you?</h1>
+        <div id="user-details">
+            <ul>
+                <li><%= user.username %></li>
+                <li><%= user.email %></li>
+                <li><%= user.county %></li>
+            </ul>
+            
+        </div>
+        <a href="/" class='text-center new-account'>Back to Sign In</a>
+
+
+    </div>
+    <div id="scripts_container">
+        <% include ../partials/scriptsToLoad %>
+    </div>
+</body>
+</html>

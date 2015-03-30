@@ -1,0 +1,28 @@
+<html lang="en">
+<head>
+    <% include ../partials/head %>
+</head>
+<body class="container">
+
+
+
+    <div>
+        <h1>Registration Details:</h1>
+        <div id="account-wall">
+            <form class="form-signin" action="/signup" method='POST' role="form">
+            <input type="text" name="username" class="form-control" placeholder='Username'>
+            <input type = "text" name="password" class="form-control" placeholder='Password'>
+            <input type = "text" name="email" class="form-control" placeholder='Email'>
+            <input type = "text" name="county" class="form-control" placeholder='County'>
+            <button class="btn btn-default" type='submit'>Register</button>
+            </form>
+        </div>
+        <a href="/" class='text-center new-account'>Back to Sign In</a>
+
+
+    </div>
+    <div id="scripts_container">
+        <% include ../partials/scriptsToLoad %>
+    </div>
+</body>
+</html>
