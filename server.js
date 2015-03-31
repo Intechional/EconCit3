@@ -4,10 +4,12 @@ var mongoose = require('mongoose');
 var _und = require('underscore-node');
 
 //DATABASE
+console.log("DB creds: " + process.env.MONGOLAB_URI);
 mongoose.connect(process.env.MONGOLAB_URI)
 var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
+db.on('error', console.error.bind(console, 'DB connection error:'));
 db.once('open', function(callback){
+	console.log("connected to db")
 	
 })
 
