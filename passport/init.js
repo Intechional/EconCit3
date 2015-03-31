@@ -1,7 +1,4 @@
 //all from https://github.com/tutsplus/passport-mongo/blob/master/passport/init.js
-
-var login = require('./login');
-var signup = require('./signup');
 var User = require('../models/user.js');
 var bCrypt = require('bcrypt-nodejs');
 var LocalStrategy   = require('passport-local').Strategy;
