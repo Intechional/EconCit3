@@ -2,9 +2,11 @@ var express = require('express');
 var mongodb = require('mongodb');
 var mongoose = require('mongoose');
 var _und = require('underscore-node');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
 
 //DATABASE
-console.log("DB creds: " + process.env.MONGOLAB_URI);
+
 mongoose.connect(process.env.MONGOLAB_URI)
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'DB connection error:'));
@@ -18,20 +20,25 @@ var app = express();
 //use ejs as view engine, so view files are ejs
 app.set('view engine', 'ejs');
 
+app.use(bodyParser.json());       // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+  extended: true
+})); 
+app.use(cookieParser())
 
 //PASSPORT
 var passport = require('passport');
 var expressSession = require('express-session');
-app.use(expressSession({secret: 'mySecretKey'})); //learn more about mySecretKey
+app.use(expressSession({secret: 'mint icecream'})); //learn more about mySecretKey
 app.use(passport.initialize());
 app.use(passport.session());
-
 var flash = require('connect-flash');
 app.use(flash());
-
-var initPassport = require('./passport/init');
+console.log("attempt to init passport:");
+var initPassport = require('./passport/init.js');
 initPassport(passport);
 
+//routes
 var routes = require('./routes/index')(passport);
 app.use('/', routes);
 
