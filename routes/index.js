@@ -18,16 +18,22 @@ var isAuthenticated = function (req, res, next) {
 
 module.exports = function(passport){
 	//get basic
-	router.get('/', function(req, res) {
-	  res.render('pages/index');
-	});
+	// router.get('/', function(req, res) {
+	//   res.render('pages/index');
+	// });
 
 	//handle login post
-	router.post('/login', passport.authenticate('login', {
-		successRedirect: '/home',
-		failureRedirect: '/',
-		failureFlash: true
-	}));
+	// router.post('/login', passport.authenticate('login', {
+	// 	successRedirect: '/home',
+	// 	failureRedirect: '/',
+	// 	failureFlash: true
+	// }));
+
+	router.post('/login',
+	 passport.authenticate('login'), 
+	 function(req, res){
+	 	res.send(req.user);
+	});
 
 	router.get('/signup', function(req, res){
 		res.render('pages/register', {message: req.flash('message')});
@@ -39,9 +45,26 @@ module.exports = function(passport){
 		failureFlash: true
 	}))
 	
-
+	router.get('/logout', function(req, res) {
+  		req.logout();
+  		res.redirect('/');
+	});
+	
 	router.get('/home', isAuthenticated, function(req, res){
+		
+		var id = req.user._id;
+		var path = '/'// + id;
+		//console.log("home path : " + path);
+		//res.sendfile(path, {root: 'public'});
+		res.redirect('/home/' + id)
+	});
+
+
+	router.get('/home/:uid', isAuthenticated, function(req, res){
+		console.log("trying to get home " + req.body.uid);
+		//res.sendfile('public/index.html');
 		res.render('pages/home', { user: req.user });
+
 	});
 
 	return router;

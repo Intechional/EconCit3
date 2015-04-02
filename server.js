@@ -4,6 +4,7 @@ var mongoose = require('mongoose');
 var _und = require('underscore-node');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var econ_cit = require('./bin/econ-cit.js')
 
 //DATABASE
 
@@ -18,6 +19,7 @@ db.once('open', function(callback){
 //APP basics
 var app = express();
 //use ejs as view engine, so view files are ejs
+
 app.set('view engine', 'ejs');
 
 app.use(bodyParser.json());       // to support JSON-encoded bodies
@@ -39,6 +41,8 @@ var initPassport = require('./passport/init.js');
 initPassport(passport);
 
 //routes
+app.use(express.static(__dirname + '/public'));
+app.use('/js', express.static(__dirname + '/public/js '))
 var routes = require('./routes/index')(passport);
 app.use('/', routes);
 
