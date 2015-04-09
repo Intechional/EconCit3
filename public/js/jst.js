@@ -12,6 +12,7 @@ window.JST['login'] = _.template(
             </form>\
         </div>\
         <button id="register-button" class="btn btn-default" type="submit">Register for a new account.</button>\
+        <div class="error-container"></div>\
     </div>'
 );
 
@@ -19,15 +20,16 @@ window.JST['register'] = _.template(
 	'<div>\
         <h1>Registration Details:</h1>\
         <div id="account-wall">\
-            <form class="form-signin" action="/signup" method="POST" role="form">\
-            <input type="text" name="username" class="form-control" placeholder="Username">\
-            <input type = "text" name="password" class="form-control" placeholder="Password">\
-            <input type = "text" name="email" class="form-control" placeholder="Email">\
-            <input type = "text" name="county" class="form-control" placeholder="County">\
-            <button class="btn btn-default" type="submit">Register</button>\
+            <form class="register-form" action="/register" method="POST" role="form">\
+            <input id="register-username" type="text" name="username" class="form-control" placeholder="Username">\
+            <input id="register-password" type = "text" name="password" class="form-control" placeholder="Password">\
+            <input id="register-email" type = "text" name="email" class="form-control" placeholder="Email">\
+            <input id="register-county" type = "text" name="county" class="form-control" placeholder="County">\
+            <button id="register-submit-button" class="btn btn-default" type="submit">Register</button>\
             </form>\
         </div>\
         <button id="login-button" class="btn btn-default" type="submit">Back to Login</button>\
+        <div class="error-container"></div>\
     </div>'
 );
 

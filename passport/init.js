@@ -20,11 +20,11 @@ module.exports = function(passport){
     });
 
     //Setting up Passport Strategy for signup:
-    passport.use('signup', new LocalStrategy({
+    passport.use('register', new LocalStrategy({
             passReqToCallback : true // allows us to pass back the entire request to the callback
         },
         function(req, username, password, done) {
-            console.log("req in signup strategy: " + JSON.stringify(req.body) + " "+ username)
+            console.log("req in register strategy: " + JSON.stringify(req.body) + " "+ username)
             findOrCreateUser = function(){
                 // find a user in Mongo with provided username
                 User.findOne({ 'username' :  username }, function(err, user) {

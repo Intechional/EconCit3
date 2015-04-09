@@ -17,33 +17,59 @@ var isAuthenticated = function (req, res, next) {
 
 
 module.exports = function(passport){
-	//get basic
-	// router.get('/', function(req, res) {
-	//   res.render('pages/index');
-	// });
+	// router.post('/login',
+	//  	passport.authenticate('login'), 
+	//  	function(req, res){
+	//  		res.send(req.user);
+	// 	}
+	// );
 
-	//handle login post
-	// router.post('/login', passport.authenticate('login', {
-	// 	successRedirect: '/home',
-	// 	failureRedirect: '/',
-	// 	failureFlash: true
-	// }));
+/* Responds with an object guaranteed to have a 'status' property that is true or false. If true, 
+the response object includes the 'uid' property that is the id of the user that is logged in. If false,
+there is a msg property containing an error message. 
 
-	router.post('/login',
-	 passport.authenticate('login'), 
-	 function(req, res){
-	 	res.send(req.user);
+This method uses passportjs to handle authorization and sessions. 
+*/
+	router.post('/login', function(req, res, next) {
+  		passport.authenticate('login', function(err, user, info) {
+    		if (err) { 
+    			return next(err); 
+    		}
+    		if (!user) { 
+    			res.send({status: false, msg: "Username and password combination incorrect. Try again or register."});
+    		}
+   			req.logIn(user, function(err) {
+     			if (err) { 
+     				return next(err); 
+     			}
+      			res.send({status: true, uid: req.user._id});
+    		});
+  		})(req, res, next);
 	});
 
-	router.get('/signup', function(req, res){
-		res.render('pages/register', {message: req.flash('message')});
+/* Responds with an object guaranteed to have a 'status' property that is true or false. If true, 
+the response object includes the 'uid' property that is the id of the user that is logged in. If false,
+there is a msg property containing an error message. 
+
+This method uses passportjs to handle authorization and sessions. 
+*/
+	router.post('/register', function(req, res, next) {
+  		passport.authenticate('register', function(err, user, info) {
+    		if (err) { 
+    			return next(err); 
+    		}
+    		if (!user) { 
+    			res.send({status: false, msg: "User may already be registered. Try logging in."});
+    		}
+   			req.logIn(user, function(err) {
+     			if (err) { 
+     				return next(err); 
+     			}
+      			res.send({status: true, uid: req.user._id});
+    		});
+  		})(req, res, next);
 	});
 
-	router.post('/signup', passport.authenticate('signup',{
-		successRedirect: '/home',
-		failureRedirect: '/signup',
-		failureFlash: true
-	}))
 	
 	router.get('/logout', function(req, res) {
   		req.logout();
