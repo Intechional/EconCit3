@@ -1,5 +1,6 @@
 //from http://code.tutsplus.com/tutorials/authenticating-nodejs-applications-with-passport--cms-21619
 var express = require('express');
+var User = require('../models/user.js');
 var router = express.Router();
 
 //need to add isAuthenticated
@@ -76,21 +77,18 @@ This method uses passportjs to handle authorization and sessions.
   		res.redirect('/');
 	});
 	
-	router.get('/home', isAuthenticated, function(req, res){
-		
-		var id = req.user._id;
-		var path = '/'// + id;
-		//console.log("home path : " + path);
-		//res.sendfile(path, {root: 'public'});
-		res.redirect('/home/' + id)
-	});
-
-
-	router.get('/home/:uid', isAuthenticated, function(req, res){
-		console.log("trying to get home " + req.body.uid);
-		//res.sendfile('public/index.html');
-		res.render('pages/home', { user: req.user });
-
+	router.get('/users/:uid', isAuthenticated, function(req, res){
+		var uid = req.params.uid;
+		console.log("getting user: " + uid);
+		User.findById(uid, function(err, foundUser){
+			if(!err){
+				console.log("found user: " + JSON.stringify(foundUser));
+				return res.send(foundUser);
+			}else{
+				console.log("ERROR: user not found in db after auth. Id: " + uid);
+				return res.send({status: false, msg: "User not found. Database error."});
+			}
+		});
 	});
 
 	return router;

@@ -91,6 +91,27 @@
 		}
 	})
 
+	//for now, implement User model here (for Backbone)
+	var User = Backbone.Model.extend({
+		url : function(){
+			var base_url = CONFIG.base_url;
+			var id = this.get("_id");
+			//if id is available, use 'users/:id' else just use "users/""
+			return id ? base_url + 'users/' + id : base_url + 'users';
+		}
+	});
+
+	var UserView = Backbone.View.extend({
+		el: $('#user-home-container'),
+		events: {},
+		initialize : function(){
+			console.log("init user view");
+			this.render(); 
+		},
+		render: function(){
+			$(this.el).html(JSON.stringify(this.model));
+		}
+	});
 
 	var AppRouter = Backbone.Router.extend({
 		routes: {
@@ -107,6 +128,19 @@
 		},
 		home: function(id){
 			console.log("home for user with id:" + id);
+			var user = new User({_id: id});
+			console.log("user _id attr: " + user.get("_id"));
+			console.log("before fetch: " + JSON.stringify(user));
+			user.fetch({
+				success: function(user, res){
+					//can we attach user view to the app object somehow?
+					var user_view = new UserView({model: user});
+				},
+				error: function(user, res){
+					console.log("after fetch: " + JSON.stringify(res));
+				}
+			});
+			
 		}
 	});
 
