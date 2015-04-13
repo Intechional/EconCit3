@@ -1,6 +1,7 @@
 //auth logic is from http://code.tutsplus.com/tutorials/authenticating-nodejs-applications-with-passport--cms-21619
 var express = require('express');
-var User = require('../models/user.js');
+//var User = require('../models/user.js');
+var User = require('../models/models.js').UserModel;
 //EconCit module is stored in public so it is also accessible in the browser. Later this can be cleaned up with requirejs.
 var EconCit = require('../public/js/econ-cit.js');
 var router = express.Router();

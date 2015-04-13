@@ -33,4 +33,44 @@ window.JST['register'] = _.template(
     </div>'
 );
 
+/*This template is the skeleton for all the econ cit category 
+input forms. It must be in the dom before the tabs and inputs 
+are added.*/
+window.JST['econ_cit_input_skeleton'] = _.template(
+    '<div role="tabpanel"> \
+                  <ul class="nav nav-tabs" role="tablist">\
+                  </ul>\
+                </div>\
+                <div class="tab-content"></div>'
+);
+
+window.JST['tab_nav_basic'] = _.template(
+    '<li role="presentation" ><a href="#<%= tab_title%>" aria-controls="<%= tab_title%>" role="tab" data-toggle="tab"><%= display_name%></a></li>'
+);
+
+window.JST['tab_pane_basic'] = _.template(
+    '<div role="tabpanel" class="tab-pane" id="<%= tab_title%>">\
+        <div class="container">\
+            <h3><%= display_name%> </h3>\
+            <div style="padding: 20px 20px 10px;">\
+                <form class="user-input-form" role="form">\
+                    <div id="<%= tab_title%>_inputs_container"></div>\
+                    <button class="btn btn-default" id="<%= tab_title%>_save_button">Save <%= display_name%> Information</button>\
+                </form>\
+                <div id="<%= tab_title%>_error_container"></div>\
+                <div id="<%= tab_title%>_score_container">\
+                    <h4></h4>\
+                </div>\
+            <div>\
+        </div>\
+    </div>' 
+);
+
+window.JST['input_basic'] = _.template(
+    '<div class="input-group">\
+        <span class="input-group-addon"><%= input_key%>: </span>\
+        <input type="text" class="form-control" placeholder="" id="<%= input_key%>_input" value="<%= input_value%>">\
+    </div>'
+);
+
 console.log("done loading jst.js")

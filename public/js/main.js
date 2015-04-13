@@ -91,6 +91,52 @@
 		}
 	})
 
+	var EconCitCategory = Backbone.Model.extend({
+		/*an EconCitCategory model is constructed
+		by passing this constructor an object that 
+		is a category object from the EconCit module, 
+		with the added property 'user.' The 'user' property
+		should be filled with the object of the current user.
+		*/
+	});
+
+	/*An EconCitCategoryView is created for each 
+	category in the EconCit module. It is called from within
+	the UserView, at the moment. 
+	*/
+	var EconCitCategoryView = Backbone.View.extend({
+		model: EconCitCategory,
+		initialize: function(){
+			_.bindAll(this, 'render', 'saveCategoryInfo');
+			this.render();
+		},
+		render: function(){
+			console.log("rendering cat: " +  this.model.get("name"));
+			var tab_info = {"tab_title": this.model.get("name"), "display_name" : this.model.get("displayName")};
+			//the following code is coupled with the econ_cit_input_skeleton template in jst.js
+			var tab_nav_template = window.JST['tab_nav_basic'];
+			var tab_pane_template = window.JST['tab_pane_basic'];
+			$('.nav-tabs').append(tab_nav_template(tab_info));
+			$('.tab-content').append(tab_pane_template(tab_info));
+			//handle inputs. Kinda messy. Move to own model & view?
+			var cat_inputs = this.model.get("inputs");
+	        var input_keys = Object.keys(cat_inputs);
+	        var selector = "#" + this.model.get("name") + "_inputs_container"
+	        var input_template = window.JST['input_basic'] ;
+	        var cat_name = this.model.get("name");
+	        _.each(input_keys, function(input_key, index, list){
+	            console.log("input key in render: " + input_key)
+	            var input_info = {"tab_title": cat_name,"input_key" : input_key, "input_value": cat_inputs[input_key]};     
+	            $(selector).append(input_template(input_info));
+	        });
+	        var button_selector = "#" + this.model.get("name") + "_save_button"; //has to match buttton id in template
+	        //bind the save button
+	        $(button_selector).click(this.saveCategoryInfo);
+		},
+		saveCategoryInfo: function(){
+			console.log("NOT IMPLEMENTED: saveCategoryInfo()");
+		}
+	});
 	//for now, implement User model here (for Backbone)
 	var User = Backbone.Model.extend({
 		url : function(){
@@ -106,15 +152,37 @@
 		events: {},
 		initialize : function(){
 			console.log("init user view");
+			//the following lines allow us to render category views after the user view is rendered. 
+			_.bindAll(this, 'render'); //keeps 'this' this in afterRender
+            this.render = _.wrap(this.render, function(render) {
+                render();
+                this.afterRender();
+            });
 			this.render(); 
 		},
 		render: function(){
-			$(this.el).html(JSON.stringify(this.model));
-			//test EconCit availability
-			EconCit.init();
-			console.log(JSON.stringify(EconCit.getCategoriesShallow()))
+			//set up skeleton for econ cit entry inputs
+			var skeleton_html = window.JST['econ_cit_input_skeleton'];
+			$(this.el).html(skeleton_html);
+		},
+		afterRender: function(){
+			console.log("after render")
+			var user_model = this.model;
+			var cats_deep = EconCit.getCategoriesDeep();
+			var cat_names = EconCit.getCategoriesShallow();
+			console.log(JSON.stringify(cat_names));
+			_.each(cat_names, function(cat_name, index, list){
+				var cat = cats_deep[cat_name];
+				cat["name"] = cat_name; //make key a 'name' property of object
+				cat["user"] = user_model;//sends entire user model object to category view for saving info. Can we do this better?
+				//create new model from cat, which now also contains the user, and make a view:
+				var cat_model = new EconCitCategory(cat);
+				var cat_view = new EconCitCategoryView({model: cat_model});
+			});
 		}
 	});
+
+
 
 	var AppRouter = Backbone.Router.extend({
 		routes: {
@@ -137,6 +205,7 @@
 			user.fetch({
 				success: function(user, res){
 					//can we attach user view to the app object somehow?
+					EconCit.init();
 					var user_view = new UserView({model: user});
 				},
 				error: function(user, res){
