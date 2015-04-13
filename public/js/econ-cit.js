@@ -59,7 +59,7 @@
 	 *return: fills the _categories object with all categories defined here. 
 	*/
 	exports.init = function(){
-		var CreditCategory = new ScoringCategory({
+		var CreditCategory = new Category({
 			name: "credit",
 			displayName:"Credit Score",	
 			inputs: {"credit_score":"default"},
@@ -83,7 +83,7 @@
 
 
 		//The first iteration has a user & coach enter a category 1-5, which is the same as the subscore for this category
-		var BankCategory = new ScoringCategory({
+		var BankCategory = new Category({
 			name: "bank",
 			displayName: "Banking Practice",
 			inputs: {"bank_score": "default"},
@@ -92,7 +92,7 @@
 			}
 		});
 
-		var CommunityEngagementCategory = new ScoringCategory({
+		var CommunityEngagementCategory = new Category({
 			name: "community",
 			displayName: "Community Engagement",
 			inputs: {
@@ -128,7 +128,7 @@
 			}
 		})
 
-		var SavingsCategory = new ScoringCategory({
+		var SavingsCategory = new Category({
 			name: "savings",
 			displayName: "Savings",
 			inputs:{"net_income": 1, "total_expenses" : 1},
@@ -154,7 +154,7 @@
 			}
 		});
 
-		var GroceriesCategory = new ScoringCategory({
+		var GroceriesCategory = new Category({
 			name: "groceries",
 			displayName: "Groceries/Household",
 			inputs:{
@@ -170,7 +170,7 @@
 
 		});
 
-		var EatingOutCategory = new ScoringCategory({
+		var EatingOutCategory = new Category({
 			name: "eating_out",
 			displayName: "Eating Out",
 			inputs: {
@@ -235,4 +235,4 @@
 	}
 
 
-})(typeof exports === 'undefined' ? this['econ-cit']={} : exports);//end closure
+})(typeof exports === 'undefined' ? this['EconCit']={} : exports);//end closure

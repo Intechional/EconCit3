@@ -1,9 +1,12 @@
-//from http://code.tutsplus.com/tutorials/authenticating-nodejs-applications-with-passport--cms-21619
+//auth logic is from http://code.tutsplus.com/tutorials/authenticating-nodejs-applications-with-passport--cms-21619
 var express = require('express');
 var User = require('../models/user.js');
+//EconCit module is stored in public so it is also accessible in the browser. Later this can be cleaned up with requirejs.
+var EconCit = require('../public/js/econ-cit.js');
 var router = express.Router();
 
-//need to add isAuthenticated
+/*isAuthenticated can be called as middleware for any route that only authorized users should have access to. 
+*/
 var isAuthenticated = function (req, res, next) {
 	// if user is authenticated in the session, call the next() to call the next request handler 
 	// Passport adds this method to request object. A middleware is allowed to add properties to
@@ -18,12 +21,6 @@ var isAuthenticated = function (req, res, next) {
 
 
 module.exports = function(passport){
-	// router.post('/login',
-	//  	passport.authenticate('login'), 
-	//  	function(req, res){
-	//  		res.send(req.user);
-	// 	}
-	// );
 
 /* Responds with an object guaranteed to have a 'status' property that is true or false. If true, 
 the response object includes the 'uid' property that is the id of the user that is logged in. If false,
@@ -90,6 +87,11 @@ This method uses passportjs to handle authorization and sessions.
 			}
 		});
 	});
+
+	//test availability of EconCit:
+	console.log("try initing EconCit from routes/index.js");
+	EconCit.init();
+	console.log(JSON.stringify(EconCit.getCategoriesShallow()));
 
 	return router;
 }

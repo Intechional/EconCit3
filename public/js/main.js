@@ -110,6 +110,9 @@
 		},
 		render: function(){
 			$(this.el).html(JSON.stringify(this.model));
+			//test EconCit availability
+			EconCit.init();
+			console.log(JSON.stringify(EconCit.getCategoriesShallow()))
 		}
 	});
 
