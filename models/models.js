@@ -5,13 +5,13 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 
-var EconCitEntry = new Schema({
-		start: Date, 
-		end: Date,
-		created: Date,
-		data: Object,
-		score: Number //this may be an object later
-});
+// var EconCitEntry = new Schema({
+// 		start: Date, 
+// 		end: Date,
+// 		created: Date,
+// 		data: Object,
+// 		score: Number //this may be an object later
+// });
 
 var UserSchema = new Schema({
 		id:String,
@@ -19,7 +19,9 @@ var UserSchema = new Schema({
 		password: String,
 		email: String,
 		county:String,
-		entries: [EconCitEntry]
+		econCitData: Object
+		//can add date and other attributes if need be. 
 })
 
 module.exports.UserModel = mongoose.model('User', UserSchema);
+//module.exports.EconCitEntryModel = mongoose.model('EconCitEntry', EconCitEntry);

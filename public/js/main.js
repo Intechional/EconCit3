@@ -133,10 +133,40 @@
 	        //bind the save button
 	        $(button_selector).click(this.saveCategoryInfo);
 		},
-		saveCategoryInfo: function(){
-			console.log("NOT IMPLEMENTED: saveCategoryInfo()");
+		saveCategoryInfo: function(e){
+			e.stopImmediatePropagation();
+        	e.preventDefault();
+        	var user_model = this.model.get("user");
+	        var cat_name = this.model.get("name");
+	        var cat_inputs = this.model.get("inputs");
+	        var cat_info ={}; 
+			var input_keys = Object.keys(cat_inputs)
+	        _.each(input_keys, function(input_key, index, list){
+	            var input_selector = '#' + input_key + "_input"; //has to match input id in template
+	            var input_value = $(input_selector).val()
+	            cat_info[input_key] = input_value; //needs some validation   
+        	});
+        	//assume valid for now:
+        	var save_data_url_base =  CONFIG.base_url + "updateUserData/";
+            var save_data_url = save_data_url_base + user_model.get("_id");
+            var data_to_send = {};
+            data_to_send[cat_name] = cat_info;
+            $.ajax(save_data_url, {
+                type: "POST",
+                dataType: "json",
+                data: data_to_send,
+                success: function(response){
+                    console.log(response);
+                    //show success message in error container.
+                }, 
+                error: function(response){
+                	console.log(response);
+                	//show error message in error container. 
+                }
+            });
 		}
 	});
+
 	//for now, implement User model here (for Backbone)
 	var User = Backbone.Model.extend({
 		url : function(){
