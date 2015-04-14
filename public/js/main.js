@@ -251,9 +251,12 @@
 	});
 
 	//TODO: programmatically match CONFIG with Heroku enviro variables
-	var CONFIG = {
-		base_url : "https://econ-cit3.herokuapp.com/" 
-	}
+	var CONFIG = {};
+	var base_url = window.location.href;
+	console.log("base_url set to : " + base_url);
+	CONFIG["base_url"] = base_url;
+
+
 	var app = new AppRouter();
 	Backbone.history.start();
 
