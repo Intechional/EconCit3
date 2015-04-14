@@ -37,11 +37,12 @@ window.JST['register'] = _.template(
 input forms. It must be in the dom before the tabs and inputs 
 are added.*/
 window.JST['econ_cit_input_skeleton'] = _.template(
-    '<div role="tabpanel"> \
+    '<div role="tabpanel">\
                   <ul class="nav nav-tabs" role="tablist">\
                   </ul>\
                 </div>\
-                <div class="tab-content"></div>'
+                <div class="tab-content"></div>\
+                <a href="/logout" class="text-center new-account">Logout</a>'
 );
 
 window.JST['tab_nav_basic'] = _.template(

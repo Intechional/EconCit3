@@ -31,7 +31,9 @@ there is a msg property containing an error message.
 This method uses passportjs to handle authorization and sessions. 
 */
 	router.post('/login', function(req, res, next) {
+		debugger
   		passport.authenticate('login', function(err, user, info) {
+  			debugger
     		if (err) { 
     			console.log(JSON.stringify(err));
     			return next(err); 
@@ -39,6 +41,7 @@ This method uses passportjs to handle authorization and sessions.
     		if (!user) { 
     			res.send({status: false, msg: "Username and password combination incorrect. Try again or register."});
     		}
+    		debugger
    			req.logIn(user, function(err) {
      			if (err) { 
      				console.log(JSON.stringify(err));
