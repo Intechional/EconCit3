@@ -33,6 +33,7 @@ This method uses passportjs to handle authorization and sessions.
 	router.post('/login', function(req, res, next) {
   		passport.authenticate('login', function(err, user, info) {
     		if (err) { 
+    			console.log(JSON.stringify(err));
     			return next(err); 
     		}
     		if (!user) { 
@@ -40,6 +41,7 @@ This method uses passportjs to handle authorization and sessions.
     		}
    			req.logIn(user, function(err) {
      			if (err) { 
+     				console.log(JSON.stringify(err));
      				return next(err); 
      			}
       			res.send({status: true, uid: req.user._id});
@@ -56,6 +58,7 @@ This method uses passportjs to handle authorization and sessions.
 	router.post('/register', function(req, res, next) {
   		passport.authenticate('register', function(err, user, info) {
     		if (err) { 
+    			console.log(JSON.stringify(err));
     			return next(err); 
     		}
     		if (!user) { 
@@ -63,6 +66,7 @@ This method uses passportjs to handle authorization and sessions.
     		}
    			req.logIn(user, function(err) {
      			if (err) { 
+     				console.log(JSON.stringify(err));
      				return next(err); 
      			}
       			res.send({status: true, uid: req.user._id});
