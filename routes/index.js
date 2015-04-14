@@ -32,6 +32,7 @@ This method uses passportjs to handle authorization and sessions.
 */
 	router.post('/login', function(req, res, next) {
 		debugger
+		console.log("in login route, before authenticate");
   		passport.authenticate('login', function(err, user, info) {
   			debugger
     		if (err) { 

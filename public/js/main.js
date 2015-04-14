@@ -36,7 +36,11 @@
 							$(".error-container").html("Incorrect username or password.");
 						}
 					},
-					error :function(){
+					error :function(jqXHR,textStatus, errorThrown){
+						console.log("Error: " + errorThrown);
+						console.log("jqXHR " + JSON.stringify(jqXHR));
+						console.log("textStatus" + textStatus);
+
 						$(".error-container").html("There was a server error. Please try again later.");
 					}
 			});
