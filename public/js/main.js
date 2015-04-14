@@ -252,7 +252,7 @@
 
 	//TODO: programmatically match CONFIG with Heroku enviro variables
 	var CONFIG = {
-		base_url : "http://localhost:5000/" 
+		base_url : "https://localhost:5000/" 
 	}
 	var app = new AppRouter();
 	Backbone.history.start();
