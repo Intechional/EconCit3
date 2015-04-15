@@ -19,14 +19,17 @@
 		},
 		'community.hours_volunteered':{
 			'pattern' : 'number',
+			'range' : [0,100000],
 			'msg' : 'Please enter a number of volunteer hours.'
 		},
 		'community.donations_in_dollars':{
 			'pattern': 'number',
+			'range' : [0,100000],
 			'msg' :'Please enter a number for donations.'
 		},
 		'community.gross_income':{
 			'pattern':'number',
+			'range' : [0,100000],
 			'msg': 'Please enter a number for your gross income.'
 		},
 		'community.county':{
@@ -34,50 +37,62 @@
 		},
 		'savings.net_income':{
 			'pattern':'number',
+			'range' : [0,100000],
 			'msg': 'Please enter a number for your net income.'
 		},
-		'savings.expenses':{
+		'savings.total_expenses':{
 			'pattern':'number',
+			'range' : [0,100000],
 			'msg': 'Please enter a number for your total expenses.'
 		},
 		'groceries.groceries_type_1_total':{
 			'pattern':'number',
+			'range' : [0,100000],
 			'msg': 'Please enter a number for your total spending at Type 1 businesses.'
 		},
 		'groceries.groceries_type_2_total':{
 			'pattern':'number',
+			'range' : [0,100000],
 			'msg': 'Please enter a number for your total spending at Type 2 businesses.'
 		},
 		'groceries.groceries_type_3_total':{
 			'pattern':'number',
+			'range' : [0,100000],
 			'msg': 'Please enter a number for your total spending at Type 3 businesses.'
 		},
 		'groceries.groceries_type_4_total':{
 			'pattern':'number',
+			'range' : [0,100000],
 			'msg': 'Please enter a number for your total spending at Type 4 businesses.'
 		},
 		'groceries.groceries_type_5_total':{
 			'pattern':'number',
+			'range' : [0,100000],
 			'msg': 'Please enter a number for your total spending at Type 5 businesses.'
 		},
 		'eating_out.eating_out_type_1_total':{
 			'pattern':'number',
+			'range' : [0,100000],
 			'msg': 'Please enter a number for your total spending at Type 1 businesses.'
 		},
 		'eating_out.eating_out_type_2_total':{
 			'pattern':'number',
+			'range' : [0,100000],
 			'msg': 'Please enter a number for your total spending at Type 2 businesses.'
 		},
 		'eating_out.eating_out_type_3_total':{
 			'pattern':'number',
+			'range' : [0,100000],
 			'msg': 'Please enter a number for your total spending at Type 3 businesses.'
 		},
 		'eating_out.eating_out_type_4_total':{
 			'pattern':'number',
+			'range' : [0,100000],
 			'msg': 'Please enter a number for your total spending at Type 4 businesses.'
 		},
 		'eating_out.eating_out_type_5_total':{
 			'pattern':'number',
+			'range' : [0,100000],
 			'msg': 'Please enter a number for your total spending at Type 5 businesses.'
 		}
 
@@ -216,9 +231,9 @@
 			name: "community",
 			displayName: "Community Engagement",
 			inputs: {
-				"hours_volunteered": 1,
-				"donations_in_dollars" : 1,
-				"gross_income": 1,
+				"hours_volunteered": 0,
+				"donations_in_dollars" : 0,
+				"gross_income": 0,
 				"county": "unknown"
 			},
 			calculationFunction:function(inputs){
@@ -251,7 +266,7 @@
 		var SavingsCategory = new Category({
 			name: "savings",
 			displayName: "Savings",
-			inputs:{"net_income": 1, "total_expenses" : 1},
+			inputs:{"net_income": 0, "total_expenses" : 0},
 			calculationFunction: function(inputs){
 				var savings_subscore = 0;
 				var income = parseInt(inputs["net_income"]) + 0.0; //hack to make float
