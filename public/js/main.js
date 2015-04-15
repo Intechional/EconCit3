@@ -136,6 +136,24 @@
 	        //bind the save button
 	        $(button_selector).click(this.saveCategoryInfo);
 		},
+		infoIsValid: function(cat_info){
+			var cat_name = this.model.get("name");
+			var validationResult = EconCit.validate(cat_name, cat_info);
+			//console.log(validationResult)
+			var validationStatus = validationResult["status"];
+			var error_selector = "#" + cat_name + "_error_container"
+			if(!validationStatus){
+				$(error_selector).html("") //clear
+	            _.each(validationResult["messages"], function(element){
+	                console.log(element);
+	                $(error_selector).append("<p>" + element + "</p>");
+	            });
+	            return false;
+			}else{
+				 $(error_selector).html(""); //clear error messages
+				 return true;
+			}
+		},
 		saveCategoryInfo: function(e){
 			e.stopImmediatePropagation();
         	e.preventDefault();
@@ -150,23 +168,25 @@
 	            cat_info[input_key] = input_value; //needs some validation   
         	});
         	//assume valid for now:
-        	var save_data_url_base =  CONFIG.base_url + "updateUserData/";
-            var save_data_url = save_data_url_base + user_model.get("_id");
-            var data_to_send = {};
-            data_to_send[cat_name] = cat_info;
-            $.ajax(save_data_url, {
-                type: "POST",
-                dataType: "json",
-                data: data_to_send,
-                success: function(response){
-                    console.log(response);
-                    //show success message in error container.
-                }, 
-                error: function(response){
-                	console.log(response);
-                	//show error message in error container. 
-                }
-            });
+        	if(this.infoIsValid(cat_info)){
+	        	var save_data_url_base =  CONFIG.base_url + "updateUserData/";
+	            var save_data_url = save_data_url_base + user_model.get("_id");
+	            var data_to_send = {};
+	            data_to_send[cat_name] = cat_info;
+	            $.ajax(save_data_url, {
+	                type: "POST",
+	                dataType: "json",
+	                data: data_to_send,
+	                success: function(response){
+	                    console.log(response);
+	                    //show success message in error container.
+	                }, 
+	                error: function(response){
+	                	console.log(response);
+	                	//show error message in error container. 
+	                }
+	            });
+	        }
 		}
 	});
 
@@ -254,7 +274,8 @@
 			user.fetch({
 				success: function(user, res){
 					//can we attach user view to the app object somehow?
-					EconCit.init();
+					
+
 					var user_view = new UserView({model: user});
 				},
 				error: function(user, res){
@@ -270,6 +291,10 @@
 	var base_url = window.location.href;
 	console.log("base_url set to : " + base_url);
 	CONFIG["base_url"] = base_url;
+
+	console.log("initing ECONCIT")
+	EconCit.init();
+
 
 
 	var app = new AppRouter();

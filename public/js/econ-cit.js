@@ -1,6 +1,127 @@
 (function(exports){
 	var _categories = {};
 
+		/*Validation code. 
+	TODO: move to separate module. 
+	TODO: reduce redundancy in those that are 1-5 scores. 
+
+	*/
+	var validationRules = {
+		'bank.bank_score':{
+			'pattern' : 'number',
+			'range' : [1,5],
+			'msg' : "Please enter bank score between 1 and 5."
+		},
+		'credit.credit_score':{
+			'pattern' : 'number',
+			'range' : [0,850],
+			'msg' : "Please enter a credit score that is 0 or between 300 and 850."
+		},
+		'community.hours_volunteered':{
+			'pattern' : 'number',
+			'msg' : 'Please enter a number of volunteer hours.'
+		},
+		'community.donations_in_dollars':{
+			'pattern': 'number',
+			'msg' :'Please enter a number for donations.'
+		},
+		'community.gross_income':{
+			'pattern':'number',
+			'msg': 'Please enter a number for your gross income.'
+		},
+		'community.county':{
+			'pattern' :'county'
+		},
+		'savings.net_income':{
+			'pattern':'number',
+			'msg': 'Please enter a number for your net income.'
+		},
+		'savings.expenses':{
+			'pattern':'number',
+			'msg': 'Please enter a number for your total expenses.'
+		},
+		'groceries.groceries_type_1_total':{
+			'pattern':'number',
+			'msg': 'Please enter a number for your total spending at Type 1 businesses.'
+		},
+		'groceries.groceries_type_2_total':{
+			'pattern':'number',
+			'msg': 'Please enter a number for your total spending at Type 2 businesses.'
+		},
+		'groceries.groceries_type_3_total':{
+			'pattern':'number',
+			'msg': 'Please enter a number for your total spending at Type 3 businesses.'
+		},
+		'groceries.groceries_type_4_total':{
+			'pattern':'number',
+			'msg': 'Please enter a number for your total spending at Type 4 businesses.'
+		},
+		'groceries.groceries_type_5_total':{
+			'pattern':'number',
+			'msg': 'Please enter a number for your total spending at Type 5 businesses.'
+		},
+		'eating_out.eating_out_type_1_total':{
+			'pattern':'number',
+			'msg': 'Please enter a number for your total spending at Type 1 businesses.'
+		},
+		'eating_out.eating_out_type_2_total':{
+			'pattern':'number',
+			'msg': 'Please enter a number for your total spending at Type 2 businesses.'
+		},
+		'eating_out.eating_out_type_3_total':{
+			'pattern':'number',
+			'msg': 'Please enter a number for your total spending at Type 3 businesses.'
+		},
+		'eating_out.eating_out_type_4_total':{
+			'pattern':'number',
+			'msg': 'Please enter a number for your total spending at Type 4 businesses.'
+		},
+		'eating_out.eating_out_type_5_total':{
+			'pattern':'number',
+			'msg': 'Please enter a number for your total spending at Type 5 businesses.'
+		}
+
+	};
+
+	var _validate = function(rules, input_value){
+		if(rules["pattern"] == "number"){
+			var status = true;
+			var msg = "";
+			var val = parseInt(input_value);
+			//console.log("val in _validate: " + val)
+			if(isNaN(val)){
+				status = false;
+				msg = "Please enter  "
+			}else{
+				if("range" in rules){
+					if(val < rules["range"][0] || val > rules["range"][1]){
+						status = false;
+					}
+				}
+			}
+			if(status == false){
+				return {"status" : status, "msg" : rules["msg"]}
+			}else{
+				return {"status" : true}
+			}
+		}//end number pattern
+		if(rules["pattern"] == "county"){
+			var validCounties = ["Alameda", "Contra Costa", "San Francisco", "San Mateo", "Santa Clara", "Other"];
+			var status = true;
+			var msg = "";
+			if(validCounties.indexOf(input_value) < 0){
+				status = false;
+				msg = "Please enter one of the following counties: " + validCounties.toString();
+			}
+			if(status == false){
+				return {"status" : status, "msg" : msg}
+			}else{
+				return {"status" : true}
+			}
+		}//end county pattern
+	};
+
+
 	//constructor for categories:
 	var Category = function(params){
 			this.displayName = params["displayName"];
@@ -17,8 +138,7 @@
             CSRange = [300, 549]
         }else if(score< 13){
             EconCitRange = [7,12]
-            CSRange = [550, 619]
-            
+            CSRange = [550, 619]     
         }else if(score < 19){
             EconCitRange = [13,18]
             CSRange = [620, 679]
@@ -109,9 +229,9 @@
 				var income = parseInt(inputs["gross_income"]) + 0.0;
 				if(income > 0){
 					var raw_score = (donations + 22.5 * hours)/income
-					console.log("phil raw score:" + raw_score)
+					console.log("community raw score:" + raw_score)
 					var adjusted_score = raw_score/county_average;
-					console.log("phil adjusted_score score:" + adjusted_score)
+					console.log("community adjusted_score score:" + adjusted_score)
 					if(adjusted_score == 0){
 						subscore = 1;
 					}else if(adjusted_score < .9){
@@ -233,6 +353,36 @@
 		score_info["final_score"] = final_score;
 		return score_info;
 	}
+
+
+
+	/*usage: EconCit.validate(category, cat_info) where cat_info is a map of the 
+	category's inputs to the user's input value for that input.
+	**return: true/false status and a message
+	*/
+
+	exports.validate = function(category_name, cat_info){
+		var status = false;
+		var errorMessages = []; //fill
+		var cat_name = category_name; //category["name"];
+		var input_keys = Object.keys(cat_info) //should match categories["inputs"]
+		input_keys.forEach(function(input_key){
+			var key = cat_name + "." + input_key
+			console.log(key)
+			var result = _validate(validationRules[key], cat_info[input_key])
+			console.log("result in validate:" + JSON.stringify(result))
+			if (result["status"] === false){
+				//console.log("bad input: " + result["msg"]);
+				errorMessages.push(result["msg"]);
+			}
+		});
+
+		if (errorMessages.length == 0){
+			status = true;
+		}
+		return {"status": status, "messages" : errorMessages}
+	}
+	
 
 
 })(typeof exports === 'undefined' ? this['EconCit']={} : exports);//end closure
