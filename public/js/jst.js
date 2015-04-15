@@ -42,7 +42,7 @@ window.JST['econ_cit_input_skeleton'] = _.template(
                   </ul>\
                 </div>\
                 <div class="tab-content"></div>\
-                <a href="/logout" class="text-center new-account">Logout</a>'
+                <button id="logout-button" class="btn btn-default">Logout</button>'
 );
 
 window.JST['tab_nav_basic'] = _.template(

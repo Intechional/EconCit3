@@ -8,7 +8,6 @@
 			this.render();
 		},
 		render: function(){
-			console.log("rendering");
 			var html = this.template();
 			$(this.el).html(html);
 		},
@@ -25,6 +24,7 @@
 				"username" : $('#login-username').val(),
 				"password" : $('#login-password').val()
 			};
+			console.log("login post url: " + url );
 			$("#login-form").ajaxForm({
 					url: url, 
 					type: 'post', 
@@ -52,23 +52,22 @@
 		el: '#user-home-container',
 		template: window.JST['register'],
 		initialize: function(){
-			console.log("initing")
 			this.render();
 		},
 		render: function(){
-			console.log("rendering");
 			var html = this.template();
 			$(this.el).html(html);
 		},
 		events :{
 			"click button#login-button" : "goToLogin",
-			"click button#register-submit-button" : "attemptRegister"
+			"click button#register-submit-button" : "attemptRegister", 
 		},
 		goToLogin : function(){
 			app.navigate("",{trigger: true});
 		}, 
 		attemptRegister : function(){
 			var url = CONFIG.base_url + "register";
+			console.log("register post url: " + url );
 			var data ={
 				"username" : $('#register-username').val(),
 				"password" : $('#register-password').val(),
@@ -76,6 +75,7 @@
 				"county" : $('#register-county').val()
 			};
 			console.log("registering " + JSON.stringify(data));
+			//not sure why this is causing problems. Possible to ask people to manually go back to home for the demo purpose. 
 			$("#register-form").ajaxForm({
 					url: url, 
 					type: 'post', 
@@ -84,6 +84,7 @@
 							$(".error-container").html(""); //clear any error message
 							app.navigate("home/" + data.uid, {trigger: true});
 						}else{
+							app.navigate("",  {trigger: true});
 							$(".error-container").html(data.msg);
 						}
 					},
@@ -115,7 +116,6 @@
 			this.render();
 		},
 		render: function(){
-			console.log("rendering cat: " +  this.model.get("name"));
 			var tab_info = {"tab_title": this.model.get("name"), "display_name" : this.model.get("displayName")};
 			//the following code is coupled with the econ_cit_input_skeleton template in jst.js
 			var tab_nav_template = window.JST['tab_nav_basic'];
@@ -129,7 +129,6 @@
 	        var input_template = window.JST['input_basic'] ;
 	        var cat_name = this.model.get("name");
 	        _.each(input_keys, function(input_key, index, list){
-	            console.log("input key in render: " + input_key)
 	            var input_info = {"tab_title": cat_name,"input_key" : input_key, "input_value": cat_inputs[input_key]};     
 	            $(selector).append(input_template(input_info));
 	        });
@@ -198,6 +197,7 @@
 			//set up skeleton for econ cit entry inputs
 			var skeleton_html = window.JST['econ_cit_input_skeleton'];
 			$(this.el).html(skeleton_html);
+			$('#logout-button').click(this.logout);
 		},
 		afterRender: function(){
 			console.log("after render")
@@ -212,6 +212,21 @@
 				//create new model from cat, which now also contains the user, and make a view:
 				var cat_model = new EconCitCategory(cat);
 				var cat_view = new EconCitCategoryView({model: cat_model});
+			});
+		},
+		logout : function(e){
+        	var url = CONFIG.base_url + "logout";
+			$.ajax({
+				url: url,
+				success: function(){
+					alert("You're logged out.");
+					app.navigate("", {trigger: true});
+					
+				},
+				error : function(){
+					alert("Please close your browser to logout.");
+					app.navigate("", {trigger: true});
+				}
 			});
 		}
 	});

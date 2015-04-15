@@ -66,6 +66,7 @@ This method uses passportjs to handle authorization and sessions.
     			return next(err); 
     		}
     		if (!user) { 
+    			res.set('Content-Type', 'text/html');
     			res.send({status: false, msg: "User may already be registered. Try logging in."});
     		}
    			req.logIn(user, function(err) {
@@ -73,15 +74,16 @@ This method uses passportjs to handle authorization and sessions.
      				console.log(JSON.stringify(err));
      				return next(err); 
      			}
+     			res.set('Content-Type', 'text/html');
       			res.send({status: true, uid: req.user._id});
     		});
   		})(req, res, next);
 	});
 
-	
+	//this needs to end. 
 	router.get('/logout', function(req, res) {
   		req.logout();
-  		res.redirect('/');
+  		res.send({status:true});
 	});
 	
 	router.get('/users/:uid', isAuthenticated, function(req, res){
