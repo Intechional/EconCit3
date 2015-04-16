@@ -128,8 +128,17 @@
 	        var selector = "#" + this.model.get("name") + "_inputs_container"
 	        var input_template = window.JST['input_basic'] ;
 	        var cat_name = this.model.get("name");
+	        var econCitData = this.model.get("user").get("econCitData");
 	        _.each(input_keys, function(input_key, index, list){
-	            var input_info = {"tab_title": cat_name,"input_key" : input_key, "input_value": cat_inputs[input_key]};     
+	        	var input_value = cat_inputs[input_key];
+	        	if(!(econCitData === undefined)){
+	        		if(!(econCitData[cat_name] === undefined)){
+	        			if(!(econCitData[cat_name][input_key] === undefined)){
+	        				input_value = econCitData[cat_name][input_key];
+	        			}
+	        		}
+	        	}
+	            var input_info = {"tab_title": cat_name,"input_key" : input_key, "input_value": input_value};     
 	            $(selector).append(input_template(input_info));
 	        });
 	        var button_selector = "#" + this.model.get("name") + "_save_button"; //has to match buttton id in template
