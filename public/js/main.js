@@ -173,6 +173,7 @@
 	            var save_data_url = save_data_url_base + user_model.get("_id");
 	            var data_to_send = {};
 	            data_to_send[cat_name] = cat_info;
+	            var catView = this;
 	            $.ajax(save_data_url, {
 	                type: "POST",
 	                dataType: "json",
@@ -180,6 +181,7 @@
 	                success: function(response){
 	                    console.log(response);
 	                    //show success message in error container.
+	                    catView.updateScore(cat_name, cat_info);
 	                }, 
 	                error: function(response){
 	                	console.log(response);
@@ -187,6 +189,13 @@
 	                }
 	            });
 	        }
+		},
+		updateScore: function(cat_name, cat_info){
+			var el = "#score_container";
+			var score = EconCit.getSubScore(cat_name, cat_info);
+			var score_html = "<p>Your subscore for the " + cat_name + " category is: " + score + "</p>";
+			$(el).append(score_html);
+			console.log("update score");
 		}
 	});
 
@@ -206,7 +215,7 @@
 		initialize : function(){
 			console.log("init user view");
 			//the following lines allow us to render category views after the user view is rendered. 
-			_.bindAll(this, 'render'); //keeps 'this' this in afterRender
+			_.bindAll(this, 'render', 'calculateTotalScore'); //keeps 'this' this in afterRender
             this.render = _.wrap(this.render, function(render) {
                 render();
                 this.afterRender();
@@ -217,6 +226,7 @@
 			//set up skeleton for econ cit entry inputs
 			var skeleton_html = window.JST['econ_cit_input_skeleton'];
 			$(this.el).html(skeleton_html);
+			$('#total-score-button').click(this.calculateTotalScore);
 			$('#logout-button').click(this.logout);
 		},
 		afterRender: function(){
@@ -232,6 +242,41 @@
 				//create new model from cat, which now also contains the user, and make a view:
 				var cat_model = new EconCitCategory(cat);
 				var cat_view = new EconCitCategoryView({model: cat_model});
+			});
+		},
+		calculateTotalScore: function(){
+			var el = "#score_container";
+			var status =  false;
+			var msg = "";
+			this.model.fetch({
+				success: function(user, res){
+					var econCitData = user.get("econCitData");
+					if(econCitData === undefined){
+						msg = "You have no Economic Citizenship data saved. Please enter all information for all categories and try again.";
+					}else{
+						//check if all categories available
+						var expected_cats = EconCit.getCategoriesShallow();
+						var found_cats = Object.keys(econCitData);
+						console.log("expected: " + expected_cats.toString())
+						console.log("filled: " + found_cats.toString())
+						if(expected_cats.length == found_cats.length){
+							var score = EconCit.scoreEntry(econCitData);
+							msg = "YOUR ECONOMIC CITIZENSHIP SCORE IS: " + score + ".";
+							status = true;
+						}else{ 
+							var unfilled_cats = _.difference(expected_cats, found_cats);
+							console.log(unfilled_cats.toString())
+							msg = "Please enter information for the following categories and then try again: " + unfilled_cats.toString();
+						}
+					}
+					console.log(msg);
+					$(el).append(msg);
+				},
+				error: function(user, res){
+					msg = "There was a server error. Please try again later.";
+					console.log("ERROR fetching user: " + JSON.stringify(res));
+					$(el).append(msg);
+				}
 			});
 		},
 		logout : function(e){

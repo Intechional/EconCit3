@@ -346,8 +346,7 @@
 	}
 
 	/*usage: econ_cit.scoreEntry(entry_data)
-	*return: score_info object mapping a subscore for each category to
-	* that subscore, a raw EconCitScore, and a final score
+	*return: a final score
 	*/
 	exports.scoreEntry = function(entry_data){
 		var categories = _categories;
@@ -364,9 +363,9 @@
 			score_info[cat_name] = subscore;
 		});
 		score_info["raw_score"] = raw_score;
-		var final_score = _mapEconCitScoreToCreditScoreScale(score);
+		var final_score = _mapEconCitScoreToCreditScoreScale(raw_score);
 		score_info["final_score"] = final_score;
-		return score_info;
+		return final_score;
 	}
 
 

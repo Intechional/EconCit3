@@ -38,11 +38,12 @@ input forms. It must be in the dom before the tabs and inputs
 are added.*/
 window.JST['econ_cit_input_skeleton'] = _.template(
     '<div role="tabpanel">\
-                  <ul class="nav nav-tabs" role="tablist">\
-                  </ul>\
-                </div>\
-                <div class="tab-content"></div>\
-                <button id="logout-button" class="btn btn-default">Logout</button>'
+        <ul class="nav nav-tabs" role="tablist"></ul>\
+    </div>\
+    <div class="tab-content"></div>\
+    <div id="score_container"></div>\
+    <button id="total-score-button" class="btn btn-default">Calculate Economic Citizenship Score</button>\
+    <button id="logout-button" class="btn btn-default">Logout</button>'
 );
 
 window.JST['tab_nav_basic'] = _.template(
@@ -59,9 +60,6 @@ window.JST['tab_pane_basic'] = _.template(
                     <button class="btn btn-default" id="<%= tab_title%>_save_button">Save <%= display_name%> Information</button>\
                 </form>\
                 <div id="<%= tab_title%>_error_container"></div>\
-                <div id="<%= tab_title%>_score_container">\
-                    <h4></h4>\
-                </div>\
             <div>\
         </div>\
     </div>' 
