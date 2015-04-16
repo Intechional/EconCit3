@@ -233,9 +233,14 @@
 		},
 		render: function(){
 			//set up skeleton for econ cit entry inputs
+			var username = this.model.get("username");
+			var header_template = window.JST['user_header'];
+			$(this.el).html(header_template({"username" : username}));
 			var skeleton_html = window.JST['econ_cit_input_skeleton'];
-			$(this.el).html(skeleton_html);
+			$(this.el).append(skeleton_html);
 			$('#total-score-button').click(this.calculateTotalScore);
+
+
 			$('#logout-button').click(this.logout);
 		},
 		afterRender: function(){
@@ -252,6 +257,7 @@
 				var cat_model = new EconCitCategory(cat);
 				var cat_view = new EconCitCategoryView({model: cat_model});
 			});
+			$('.tab-pane:first').addClass("active");
 		},
 		calculateTotalScore: function(){
 			var el = "#score_container";

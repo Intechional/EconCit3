@@ -33,6 +33,14 @@ window.JST['register'] = _.template(
     </div>'
 );
 
+window.JST['user_header'] = _.template(
+       '<div class="well well-sm">\
+            <div class="text-center">\
+                You are logged in as <%=username%> --- \
+                <button id="logout-button" class="btn btn-xm">Logout</button>\
+            </div>\
+        </div'
+);
 /*This template is the skeleton for all the econ cit category 
 input forms. It must be in the dom before the tabs and inputs 
 are added.*/
@@ -41,9 +49,10 @@ window.JST['econ_cit_input_skeleton'] = _.template(
         <ul class="nav nav-tabs" role="tablist"></ul>\
     </div>\
     <div class="tab-content"></div>\
-    <div id="score_container"></div>\
-    <button id="total-score-button" class="btn btn-default">Calculate Economic Citizenship Score</button>\
-    <button id="logout-button" class="btn btn-default">Logout</button>'
+    <div class="well well-sm text-center">\
+        <div id="score_container"></div>\
+        <button class="center" id="total-score-button" class="btn btn-default">Calculate Economic Citizenship Score</button>\
+    </div>'
 );
 
 window.JST['tab_nav_basic'] = _.template(
