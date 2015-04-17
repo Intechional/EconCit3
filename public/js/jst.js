@@ -20,7 +20,7 @@ window.JST['register'] = _.template(
 	'<div>\
         <h1>Registration Details:</h1>\
         <div id="account-wall">\
-            <form class="register-form" action="/register" method="POST" role="form">\
+            <form id="register-form" action="/register" method="POST" role="form">\
             <input id="register-username" type="text" name="username" class="form-control" placeholder="Username">\
             <input id="register-password" type = "text" name="password" class="form-control" placeholder="Password">\
             <input id="register-email" type = "text" name="email" class="form-control" placeholder="Email">\

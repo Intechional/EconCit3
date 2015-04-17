@@ -31,10 +31,7 @@ there is a msg property containing an error message.
 This method uses passportjs to handle authorization and sessions. 
 */
 	router.post('/login', function(req, res, next) {
-		debugger
-		console.log("in login route, before authenticate");
   		passport.authenticate('login', function(err, user, info) {
-  			debugger
     		if (err) { 
     			console.log(JSON.stringify(err));
     			return next(err); 
@@ -42,7 +39,6 @@ This method uses passportjs to handle authorization and sessions.
     		if (!user) { 
     			res.send({status: false, msg: "Username and password combination incorrect. Try again or register."});
     		}
-    		debugger
    			req.logIn(user, function(err) {
      			if (err) { 
      				console.log(JSON.stringify(err));
@@ -66,7 +62,6 @@ This method uses passportjs to handle authorization and sessions.
     			return next(err); 
     		}
     		if (!user) { 
-    			res.set('Content-Type', 'text/html');
     			res.send({status: false, msg: "User may already be registered. Try logging in."});
     		}
    			req.logIn(user, function(err) {
@@ -74,7 +69,6 @@ This method uses passportjs to handle authorization and sessions.
      				console.log(JSON.stringify(err));
      				return next(err); 
      			}
-     			res.set('Content-Type', 'text/html');
       			res.send({status: true, uid: req.user._id});
     		});
   		})(req, res, next);

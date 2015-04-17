@@ -4,7 +4,6 @@
 		el: '#user-home-container',
 		template: window.JST['login'],
 		initialize: function(){
-			console.log("initing")
 			this.render();
 		},
 		render: function(){
@@ -16,7 +15,7 @@
 			"click button#login-submit-button" : "attemptLogin"
 		},
 		goToRegister : function(){
-			app.navigate("register", {trigger: true});
+			app.navigate("signup", {trigger: true});
 		},
 		attemptLogin : function(){
 			var url = CONFIG.base_url + "login";
@@ -65,7 +64,7 @@
 		goToLogin : function(){
 			app.navigate("",{trigger: true});
 		}, 
-		attemptRegister : function(){
+		attemptRegister : function(e){
 			var url = CONFIG.base_url + "register";
 			console.log("register post url: " + url );
 			var data ={
@@ -80,19 +79,20 @@
 					url: url, 
 					type: 'post', 
 					success: function(data){
+						console.log("success returned from register ajax")
 						if(data.status === true){
 							$(".error-container").html(""); //clear any error message
 							app.navigate("home/" + data.uid, {trigger: true});
 						}else{
-							app.navigate("",  {trigger: true});
 							$(".error-container").html(data.msg);
 						}
 					},
 					error :function(){
+						console.log("error returned from register ajax");
 						$(".error-container").html("There was a server error. Please try again later.");
 					}
 			});
-
+			console.log("ajax called, maybe not returned");
 		}
 	})
 
@@ -316,7 +316,7 @@
 	var AppRouter = Backbone.Router.extend({
 		routes: {
 			"": "login",
-			"register" : "register",
+			"signup" : "register",
 			"home/:id" : "home"
 		},
 		login: function(){
