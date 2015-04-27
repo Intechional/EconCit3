@@ -200,11 +200,20 @@
 	        }
 		},
 		updateScore: function(cat_name, cat_info){
-			var el = "#score_container";
-			var score = EconCit.getSubScore(cat_name, cat_info);
-			var score_html = "<p>Your subscore for the " + cat_name + " category is: " + score + "</p>";
-			$(el).append(score_html);
-			console.log("update score");
+			this.model.get("user").fetch({
+				success: function(){
+					console.log("fetched user, updating score");
+					var el = "#score_container";
+					var score = EconCit.getSubScore(cat_name, cat_info);
+					var score_html = "<p>Your subscore for the " + cat_name + " category is: " + score + "</p>";
+					$(el).append(score_html);
+					console.log("update score");
+				},
+				error: function(){
+					console.log("error fetching user on updateScore");
+				}
+			});
+
 		}
 	});
 
@@ -269,6 +278,7 @@
 					if(econCitData === undefined){
 						msg = "You have no Economic Citizenship data saved. Please enter all information for all categories and try again.";
 					}else{
+						console.log("fetched updated user information");
 						//check if all categories available
 						var expected_cats = EconCit.getCategoriesShallow();
 						var found_cats = Object.keys(econCitData);
@@ -334,8 +344,6 @@
 			user.fetch({
 				success: function(user, res){
 					//can we attach user view to the app object somehow?
-					
-
 					var user_view = new UserView({model: user});
 				},
 				error: function(user, res){
@@ -349,8 +357,8 @@
 	//TODO: programmatically match CONFIG with Heroku enviro variables
 	var CONFIG = {};
 	//var base_url = window.location.href;
-	//var base_url = "http://localhost:5000/";
-	var base_url = "https://econ-cit3.herokuapp.com/"
+	var base_url = "http://localhost:5000/";
+	//var base_url = "https://econ-cit3.herokuapp.com/"
 	console.log("base_url set to : " + base_url);
 	CONFIG["base_url"] = base_url;
 

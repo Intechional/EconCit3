@@ -1,5 +1,6 @@
 (function(exports){
 	var _categories = {};
+	var _total_raw_score = 30; //fill programmatically
 
 		/*Validation code. 
 	TODO: move to separate module. 
@@ -136,12 +137,21 @@
 		}//end county pattern
 	};
 
+		//this is pseudocode - need to fix on wed. has 5 hardcoded into it. 
+	_scaleSubscore = function(subscore, weight){
+		var multiplier = weight * _total_raw_score;
+		var scaled_score = multiplier * subscore/5;
+		return scaled_score
+	}
+
+
 
 	//constructor for categories:
 	var Category = function(params){
 			this.displayName = params["displayName"];
 			this.inputs = params["inputs"];
 			this.calculationFunction = params["calculationFunction"];
+			this.weight = params["weight"];//these should sum to 1 over all categories
 			_categories[params["name"]] = this;
 	};
 
@@ -170,7 +180,13 @@
 		return value;
 	}
 
+	/*Returns rounded-up weighted average of scores i={1:5}, where
+	the weight is the percentage of the i'th value of the grand total of the values.
+	*This is not generalized yet,and only useful for the groceries and eating out
+	categories. TODO: generalize this. 
+	*/
 	var _getWeightedAvg = function(inputs){
+		console.log("inputs: " + JSON.stringify(inputs));
 		var weighted_avg = 0;
 		var original_totals = [];
 		var keys = Object.keys(inputs);
@@ -198,6 +214,7 @@
 			name: "credit",
 			displayName:"Credit Score",	
 			inputs: {"credit_score":"default"},
+			weight: .1,
 			calculationFunction : function(inputs){
 				var subscore = 0;
 				var credit_score = parseInt(inputs["credit_score"]);
@@ -222,6 +239,7 @@
 			name: "bank",
 			displayName: "Banking Practice",
 			inputs: {"bank_score": "default"},
+			weight: .2,
 			calculationFunction : function(inputs){
 				return(parseInt(inputs["bank_score"])) //not 100 percent sure this is the function param and not the same as this.inputs
 			}
@@ -236,6 +254,7 @@
 				"gross_income": 0,
 				"county": "unknown"
 			},
+			weight: .1,
 			calculationFunction:function(inputs){
 				var subscore = 0;
 				var county_average= .04 //hardcoded
@@ -267,6 +286,7 @@
 			name: "savings",
 			displayName: "Savings",
 			inputs:{"net_income": 0, "total_expenses" : 0},
+			weight: .1,
 			calculationFunction: function(inputs){
 				var savings_subscore = 0;
 				var income = parseInt(inputs["net_income"]) + 0.0; //hack to make float
@@ -299,6 +319,7 @@
 				"groceries_type_4_total" : 0,
 				"groceries_type_5_total" : 0
 			},
+			weight: .25, 
 			calculationFunction : function(inputs){
 				return _getWeightedAvg(inputs);
 			}
@@ -315,6 +336,7 @@
 				"eating_out_type_4_total" : 0,
 				"eating_out_type_5_total" : 0
 			},
+			weight: .25, 
 			calculationFunction: function(inputs){
 				return _getWeightedAvg(inputs);
 			}
@@ -346,23 +368,49 @@
 	}
 
 	/*usage: econ_cit.scoreEntry(entry_data)
+	*example of entry_data:
+	{
+		"groceries": {"groceries_type_5_total":"40",
+			"groceries_type_4_total":"0",
+			"groceries_type_3_total":"80",
+			"groceries_type_2_total":"0",
+			"groceries_type_1_total":"0"},
+		"community":{"hours_volunteered":"6",
+			"donations_in_dollars":"20",
+			"gross_income":"1800",
+			"county":"Alameda"},
+		"credit":{"credit_score":"600"},
+		"bank":{"bank_score":"3"},
+		"savings":{"net_income":"1600",
+			"total_expenses":"1400"},
+		"eating_out"{"eating_out_type_1_total":"10",
+			"eating_out_type_2_total":"0",
+			"eating_out_type_3_total":"20",
+			"eating_out_type_4_total":"0",
+			"eating_out_type_5_total":"0"}
+	}
 	*return: a final score
 	*/
+
+
 	exports.scoreEntry = function(entry_data){
+		console.log(JSON.stringify(entry_data));
 		var categories = _categories;
-		var cats_in_entry = Object.keys(entry_data);
+		var cats_in_entry = Object.keys(entry_data); //if a user hasn't entered data for an category, that cat will not be present
 		var raw_score = 0;
-		var score_info = {};
+		var score_info = {}; //maps cat_name to subscore
 		cats_in_entry.forEach(function(element, index, list){
 			var cat_name = element;
-			var cat = categories[cat_name];
+			var cat = categories[cat_name]; //gets the full category object so that we can look up any information about it
 			var subscoreFun = cat["calculationFunction"];
-			var subscore = subscoreFun(entry_data[cat_name])
+			var subscore = subscoreFun(entry_data[cat_name]) //sends user's data for that category to the category's scoring function
 			console.log(cat_name + " subscore: " + subscore);
-			raw_score += subscore;
-			score_info[cat_name] = subscore;
+			var scaled_subscore = _scaleSubscore(subscore, cat["weight"]);
+			console.log("scaled subscore: " + scaled_subscore)
+			raw_score += scaled_subscore;
+			score_info[cat_name] = scaled_subscore;
 		});
-		score_info["raw_score"] = raw_score;
+		score_info["raw_score"] = raw_score; 
 		var final_score = _mapEconCitScoreToCreditScoreScale(raw_score);
 		score_info["final_score"] = final_score;
 		return final_score;
