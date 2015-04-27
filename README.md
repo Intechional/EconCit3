@@ -15,8 +15,8 @@ This is a prototype for TIGRA’s ‘Economic Citizenship App’ to demonstrate 
 *  index.html: *sets up container for Backbone and loads scripts*
 *  /js
   *    econ-cit.js: *see below*
-  *    jst.js: *see below*
-  *    main.js: *see below*
+  *    jst.js: *Holds underscore templates used by main.js*
+  *    main.js: *Implements all front-end functionality. Uses a User model and Category model to handle display and interactions.*
 *    /styles	
   *    main.css : *not much here now*	
 *    /routes	
@@ -28,3 +28,21 @@ This is a prototype for TIGRA’s ‘Economic Citizenship App’ to demonstrate 
   *  models.js: *implements back-end user model for mongoose*
 * /node_modules: *automatically created directory by node to handle dependencies*
 
+###econ-cit.js
+* Purpose:encode the economic citizenship scoring logic in one place, and in a way that is easily configurable & adjustable. 
+* available to the front-end and back-end. 
+* exports functions necessary for accessing category information and scoring.
+* A Category object has:
+  * name
+  * displayName
+  *inputs. This is an object that currently maps a name of an input to a value. These are values used by the 
+  * calculationFunction:  takes the inputs object as an argument and outputs a subScore between 1 and 5. 
+
+##TODOs:
+* improve back-end data validation
+* Improve scoring display
+* Improve README.md
+* Incorporate require.js to allow better file structuring, like breaking up main.js into multiple files.
+* Allow multiple Economic Citizenship entries per user. Requires redesign of user home page to allow user option of viewing and editing existing entries, or creating a new one. 
+* complete community engagement scoring function
+* improve sign-in information so remembering password isn't a problem
