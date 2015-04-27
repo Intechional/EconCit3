@@ -11,14 +11,14 @@ This is a prototype for TIGRA’s ‘Economic Citizenship App’ to demonstrate 
 *  server.js: *runs node.js server that serves /public files as static content, and sets up what’s in the routes directory*
 * Procfile: *used by Heroku to start app*
 * package.json: *used by Heroku to handle dependencies*
-* public
-*  index.html: *sets up container for Backbone and loads scripts*
-*  /js
-  *    econ-cit.js: *see below*
-  *    jst.js: *Holds underscore templates used by main.js*
-  *    main.js: *Implements all front-end functionality. Uses a User model and Category model to handle display and interactions.*
-*    /styles	
-  *    main.css : *not much here now*	
+* /public
+  *  index.html: *sets up container for Backbone and loads scripts*
+  *  /js
+    *    econ-cit.js: *see below*
+    *    jst.js: *Holds underscore templates used by main.js*
+    *    main.js: *Implements all front-end functionality. Uses a User model and Category model to handle display and interactions.*
+  *    /styles	
+    *    main.css : *not much here now*	
 *    /routes	
   *      index.js: *implements a json API that lets Backbone talk to the MongoDB.*
 */passport
@@ -32,11 +32,10 @@ This is a prototype for TIGRA’s ‘Economic Citizenship App’ to demonstrate 
 * Purpose:encode the economic citizenship scoring logic in one place, and in a way that is easily configurable & adjustable. 
 * available to the front-end and back-end. 
 * exports functions necessary for accessing category information and scoring.
-* A Category object has:
-  * name
-  * displayName
-  *inputs. This is an object that currently maps a name of an input to a value. These are values used by the 
-  * calculationFunction:  takes the inputs object as an argument and outputs a subScore between 1 and 5. 
+* A Category object encodes the logic for the various attributes of a Citizenship Score, such as banking, or grocery spending. Its most important attributes are:
+  * name (of the category)
+  * inputs. Each category requires specific inputs to calculate a subscore for the category. This is an object mapping the name of an input to the user's value for that input. 
+  * calculationFunction:  takes the inputs object as an argument and outputs a subScore between 1 and 5, according to logic specific to the category.
 
 ##TODOs:
 * improve back-end data validation
