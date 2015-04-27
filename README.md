@@ -12,11 +12,11 @@ This is a prototype for TIGRA’s ‘Economic Citizenship App’ to demonstrate 
 * Procfile: *used by Heroku to start app*
 * package.json: *used by Heroku to handle dependencies*
 * public
-  *index.html: *sets up container for Backbone and loads scripts*
-  *js
-     *econ-cit.js: *see below*
-     *jst.js: *see below*
-     *main.js: *see below*
+  -index.html: *sets up container for Backbone and loads scripts*
+  -js
+     -econ-cit.js: *see below*
+     -jst.js: *see below*
+     -main.js: *see below*
   * /styles	
      1.main.css : *not much here now*	
   * /routes		
