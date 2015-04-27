@@ -12,19 +12,19 @@ This is a prototype for TIGRA’s ‘Economic Citizenship App’ to demonstrate 
 * Procfile: *used by Heroku to start app*
 * package.json: *used by Heroku to handle dependencies*
 * public
-  -index.html: *sets up container for Backbone and loads scripts*
-  -js
-     -econ-cit.js: *see below*
-     -jst.js: *see below*
-     -main.js: *see below*
-  * /styles	
-     1.main.css : *not much here now*	
-  * /routes		
-      1. index.js: *implements a json API that lets Backbone talk to the MongoDB.*
-  5. /passport
-      1. init.js: *implements passport.js strategies for user login and registration.* 
-  6. /views: *TODO delete this directory*
-  7. /models
-      1.models.js: **implements back-end user model for mongoose*
-  8./node_modules: **automatically created directory by and for node dependencies*
+*  index.html: *sets up container for Backbone and loads scripts*
+*  /js
+  *    econ-cit.js: *see below*
+  *    jst.js: *see below*
+  *    main.js: *see below*
+*    /styles	
+  *    main.css : *not much here now*	
+*    /routes	
+  *      index.js: *implements a json API that lets Backbone talk to the MongoDB.*
+*/passport
+   * init.js: *implements passport.js strategies for user login and registration.* 
+* /views: *TODO delete this directory*
+* /models
+  *  models.js: *implements back-end user model for mongoose*
+* /node_modules: *automatically created directory by node to handle dependencies*
 
