@@ -116,7 +116,9 @@
 			this.render();
 		},
 		render: function(){
-			var tab_info = {"tab_title": this.model.get("name"), "display_name" : this.model.get("displayName")};
+			var tab_info = {"tab_title": this.model.get("name"), 
+							"display_name" : this.model.get("displayName"),
+							"instructions": this.model.get("instructions")};
 			//the following code is coupled with the econ_cit_input_skeleton template in jst.js
 			var tab_nav_template = window.JST['tab_nav_basic'];
 			var tab_pane_template = window.JST['tab_pane_basic'];

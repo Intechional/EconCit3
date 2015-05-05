@@ -1,3 +1,24 @@
+/* 
+*Purpose: this module encodes Economic Citizenship Score logic, developed by and intellectual property of, TIGRA 
+* (Transnational Institute for Grassroots Research and Action). 
+* 
+* It exports 'Categories' which, as a group of objects represent
+* categories of data that is input for an Economic
+* Citizenship score. It also exports scoring functionality that converts
+* the input data into an Economic Citizenship Score. 
+*
+*
+*Usage: 
+* To make available:
+* On server: var EconCit = require('path/to/econ-cit.js');
+* In browser: <script src="js/econ-cit.js"></script>
+*
+* To initialize:
+* EconCit.init();
+*
+* See exports in this file for objects and functions exported by this module. 
+*/
+
 (function(exports){
 	var _categories = {};
 	var _total_raw_score = 30; //fill programmatically
@@ -6,6 +27,8 @@
 	TODO: move to separate module. 
 	TODO: reduce redundancy in those that are 1-5 scores. 
 
+	/*Validation rules must match the category declaraion in the name of 
+	the category and the name of each input. 
 	*/
 	var validationRules = {
 		'bank.bank_score':{
@@ -99,6 +122,10 @@
 
 	};
 
+	/*_validate is an internal function called by EconCit.validate() that, given the rules
+	for an input and the user's input value returns true/false whether it is valid, and a 
+	message about what needs to be fixed. 
+	*/
 	var _validate = function(rules, input_value){
 		if(rules["pattern"] == "number"){
 			var status = true;
@@ -137,7 +164,13 @@
 		}//end county pattern
 	};
 
-		//this is pseudocode - need to fix on wed. has 5 hardcoded into it. 
+	/**
+	This function, called by the exported function scoreEntry(),
+	has 5 hardcoded into it, as the maximum subscore per category. 
+	It takes a subscore (value 1 to 5) and the weight (from a category) and
+	scales the subscore to match the weight. It assumes the sum of weights
+	across all categories is 1. 
+	*/
 	_scaleSubscore = function(subscore, weight){
 		var multiplier = weight * _total_raw_score;
 		var scaled_score = multiplier * subscore/5;
@@ -146,15 +179,26 @@
 
 
 
-	//constructor for categories:
+	/*This constructor for a Category encodes all the necessary
+	attributes of a category for both front-end and back-end usage. 
+	Clients of the econ-cit.js module can assume every Category
+	has all properties in the constructure, and all Category instances
+	should have all these properties.  
+	*/
 	var Category = function(params){
 			this.displayName = params["displayName"];
 			this.inputs = params["inputs"];
 			this.calculationFunction = params["calculationFunction"];
 			this.weight = params["weight"];//these should sum to 1 over all categories
+			this.instructions = params["instructions"]
 			_categories[params["name"]] = this;
 	};
 
+	/**
+	*This function hard-codes the mapping between the total out of 30 (assuming 5 points
+	maximum in each of 6 categories) to something in line with a credit score. These mapping rules
+	were developed by TIGRA staff. 
+	*/
 	var _mapEconCitScoreToCreditScoreScale = function(score){
         var EconCitRange = [0,6]
 		var CSRange = [300, 550]
@@ -207,13 +251,16 @@
 
 	}
 	/*Usage: econ-cit.init()
-	 *return: fills the _categories object with all categories defined here. 
+	 *return: fills the _categories object with all categories defined here.
+	 *This funciton must be called by clients of the econ-cit.js module before any 
+	 *other client calls will function properly.  
 	*/
 	exports.init = function(){
 		var CreditCategory = new Category({
 			name: "credit",
 			displayName:"Credit Score",	
 			inputs: {"credit_score":"default"},
+			instructions: "Enter your credit score if you know it, or work with your coach to learn what it is. TIGRA and TIGRA's partners can help you get your credit score.",
 			weight: .1,
 			calculationFunction : function(inputs){
 				var subscore = 0;
@@ -234,12 +281,15 @@
 		});
 
 
-		//The first iteration has a user & coach enter a category 1-5, which is the same as the subscore for this category
+		/*
+		*The first iteration has a user & coach enter a category 1-5, which is the same as the subscore for this category
+		*/
 		var BankCategory = new Category({
 			name: "bank",
 			displayName: "Banking Practice",
 			inputs: {"bank_score": "default"},
 			weight: .2,
+			instructions: "Work with your coach to determine your score between 1 and 5 for the banking category.",
 			calculationFunction : function(inputs){
 				return(parseInt(inputs["bank_score"])) //not 100 percent sure this is the function param and not the same as this.inputs
 			}
@@ -255,6 +305,7 @@
 				"county": "unknown"
 			},
 			weight: .1,
+			instructions: "Tell us how many hours you have volunteered (you may volunteer at a church, school, organization, or help out neighbors) and any money you donate. Work with your coach to figure out your gross income.",
 			calculationFunction:function(inputs){
 				var subscore = 0;
 				var county_average= .04 //hardcoded
@@ -287,6 +338,7 @@
 			displayName: "Savings",
 			inputs:{"net_income": 0, "total_expenses" : 0},
 			weight: .1,
+			instructions: "Work with your coach to figure out your net income (after taxes) and your total expenses.",
 			calculationFunction: function(inputs){
 				var savings_subscore = 0;
 				var income = parseInt(inputs["net_income"]) + 0.0; //hack to make float
@@ -319,6 +371,7 @@
 				"groceries_type_4_total" : 0,
 				"groceries_type_5_total" : 0
 			},
+			instructions: "Work with your coach to decide what type of businesses you have bought your groceries at. Enter the total dollars you have spent at each type of grocery store.",
 			weight: .25, 
 			calculationFunction : function(inputs){
 				return _getWeightedAvg(inputs);
@@ -336,16 +389,21 @@
 				"eating_out_type_4_total" : 0,
 				"eating_out_type_5_total" : 0
 			},
+			instructions: "Work with your coach to decide what type of businesses you have eaten out at or used for entertainment. Enter the total dollars you have spent at each type of business",
 			weight: .25, 
 			calculationFunction: function(inputs){
 				return _getWeightedAvg(inputs);
 			}
 		});		
 	};
-
+ 
+	/*If EconCit.init() has been called, EconCit.getCategorieseep
+	*returns an array whose elements are names of categories. 
+	*/
 	exports.getCategoriesShallow = function(){
 		return Object.keys(_categories);
 	}
+
 
 	exports.getCategoriesDeep = function(){
 		return _categories;
