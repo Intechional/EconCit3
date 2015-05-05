@@ -11,20 +11,37 @@ This is a prototype for TIGRA’s ‘Economic Citizenship App’ to demonstrate 
 *  server.js: *runs node.js server that serves /public files as static content, and sets up what’s in the routes directory*
 * Procfile: *used by Heroku to start app*
 * package.json: *used by Heroku to handle dependencies*
-* public
-  -index.html: *sets up container for Backbone and loads scripts*
-  -js
-     -econ-cit.js: *see below*
-     -jst.js: *see below*
-     -main.js: *see below*
-  * /styles	
-     1.main.css : *not much here now*	
-  * /routes		
-      1. index.js: *implements a json API that lets Backbone talk to the MongoDB.*
-  5. /passport
-      1. init.js: *implements passport.js strategies for user login and registration.* 
-  6. /views: *TODO delete this directory*
-  7. /models
-      1.models.js: **implements back-end user model for mongoose*
-  8./node_modules: **automatically created directory by and for node dependencies*
+* /public
+  *  index.html: *sets up container for Backbone and loads scripts*
+  *  /js
+    *    econ-cit.js: *see below*
+    *    jst.js: *Holds underscore templates used by main.js*
+    *    main.js: *Implements all front-end functionality. Uses a User model and Category model to handle display and interactions.*
+  *    /styles	
+    *    main.css : *not much here now*	
+*    /routes	
+  *      index.js: *implements a json API that lets Backbone talk to the MongoDB.*
+*/passport
+   * init.js: *implements passport.js strategies for user login and registration.* 
+* /views: *TODO delete this directory*
+* /models
+  *  models.js: *implements back-end user model for mongoose*
+* /node_modules: *automatically created directory by node to handle dependencies*
 
+###econ-cit.js
+* Purpose:encode the economic citizenship scoring logic in one place, and in a way that is easily configurable & adjustable. 
+* available to the front-end and back-end. 
+* exports functions necessary for accessing category information and scoring.
+* A Category object encodes the logic for the various attributes of a Citizenship Score, such as banking, or grocery spending. Its most important attributes are:
+  * name (of the category)
+  * inputs. Each category requires specific inputs to calculate a subscore for the category. This is an object mapping the name of an input to the user's value for that input. 
+  * calculationFunction:  takes the inputs object as an argument and outputs a subScore between 1 and 5, according to logic specific to the category.
+
+##TODOs:
+* improve back-end data validation
+* Improve scoring display
+* Improve README.md
+* Incorporate require.js to allow better file structuring, like breaking up main.js into multiple files.
+* Allow multiple Economic Citizenship entries per user. Requires redesign of user home page to allow user option of viewing and editing existing entries, or creating a new one. 
+* complete community engagement scoring function
+* improve sign-in information so remembering password isn't a problem
