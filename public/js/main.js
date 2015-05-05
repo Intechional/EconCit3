@@ -359,8 +359,8 @@
 	//TODO: programmatically match CONFIG with Heroku enviro variables
 	var CONFIG = {};
 	//var base_url = window.location.href;
-	var base_url = "http://localhost:5000/";
-	//var base_url = "https://econ-cit3.herokuapp.com/"
+	//var base_url = "http://localhost:5000/";
+	var base_url = "https://econ-cit3.herokuapp.com/"
 	console.log("base_url set to : " + base_url);
 	CONFIG["base_url"] = base_url;
 
