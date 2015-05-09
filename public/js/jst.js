@@ -33,13 +33,14 @@ window.JST['register'] = _.template(
     </div>'
 );
 
-window.JST['user_header'] = _.template(
+window.JST['user_skeleton'] = _.template(
        '<div class="well well-sm">\
             <div class="text-center">\
                 You are logged in as <%=username%> --- \
                 <button id="logout-button" class="btn btn-xm">Logout</button>\
             </div>\
-        </div'
+        </div>\
+        <div id="econ-cit-container"></div>'
 );
 /*This template is the skeleton for all the econ cit category 
 input forms. It must be in the dom before the tabs and inputs 

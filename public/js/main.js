@@ -245,10 +245,10 @@
 		render: function(){
 			//set up skeleton for econ cit entry inputs
 			var username = this.model.get("username");
-			var header_template = window.JST['user_header'];
-			$(this.el).html(header_template({"username" : username}));
-			var skeleton_html = window.JST['econ_cit_input_skeleton'];
-			$(this.el).append(skeleton_html);
+			var skeleton_template = window.JST['user_skeleton'];
+			$(this.el).html(skeleton_template({"username" : username}));
+			var econ_cit_input_skeleton_html = window.JST['econ_cit_input_skeleton'];
+			$("#econ-cit-container").append(econ_cit_input_skeleton_html);
 			$('#total-score-button').click(this.calculateTotalScore);
 
 
@@ -359,8 +359,8 @@
 	//TODO: programmatically match CONFIG with Heroku enviro variables
 	var CONFIG = {};
 	//var base_url = window.location.href;
-	//var base_url = "http://localhost:5000/";
-	var base_url = "https://econ-cit3.herokuapp.com/"
+	var base_url = "http://localhost:5000/";
+	//var base_url = "https://econ-cit3.herokuapp.com/"
 	console.log("base_url set to : " + base_url);
 	CONFIG["base_url"] = base_url;
 
