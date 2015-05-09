@@ -1,7 +1,8 @@
 //auth logic is from http://code.tutsplus.com/tutorials/authenticating-nodejs-applications-with-passport--cms-21619
 var express = require('express');
 //var User = require('../models/user.js');
-var User = require('../models/models.js').UserModel;
+var UserModel = require('../models/models.js').UserModel;
+var UserRoutes = require('./user.js');
 var EconCitEntry = require('../models/models.js').EconCitEntryModel;
 //EconCit module is stored in public so it is also accessible in the browser. Later this can be cleaned up with requirejs.
 var EconCit = require('../public/js/econ-cit.js');
@@ -80,19 +81,8 @@ This method uses passportjs to handle authorization and sessions.
   		res.send({status:true});
 	});
 	
-	router.get('/users/:uid', isAuthenticated, function(req, res){
-		var uid = req.params.uid;
-		console.log("getting user: " + uid);
-		User.findById(uid, function(err, foundUser){
-			if(!err){
-				console.log("found user: " + JSON.stringify(foundUser));
-				return res.send(foundUser);
-			}else{
-				console.log("ERROR: user not found in db after auth. Id: " + uid);
-				return res.send({status: false, msg: "User not found. Database error."});
-			}
-		});
-	});
+	router.get('/users/:uid', isAuthenticated, UserRoutes.getUser);
+	router.get('/createEntry/:uid', isAuthenticated, UserRoutes.createEntry);
 
 /*This method currently  assumes only one entry per user, and only updates category info. 
 It needs to be generalized to handle updates to other entry attributes, choose a specific entry,
@@ -145,7 +135,6 @@ and update other user info.*/
 	//must initialize the EconCit module to be available on the server side
 	console.log("initing EconCit from routes/index.js");
 	EconCit.init();
-	console.log(JSON.stringify(EconCit.getCategoriesShallow()));
 
 	return router;
 }

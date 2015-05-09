@@ -38,6 +38,7 @@ window.JST['user_skeleton'] = _.template(
             <div class="text-center">\
                 You are logged in as <%=username%> --- \
                 <button id="logout-button" class="btn btn-xm">Logout</button>\
+                <button id="create-entry-button" class="btn btn-xm">Create Entry</button>\
             </div>\
         </div>\
         <div id="econ-cit-container"></div>'

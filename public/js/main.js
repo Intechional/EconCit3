@@ -235,7 +235,7 @@
 		initialize : function(){
 			console.log("init user view");
 			//the following lines allow us to render category views after the user view is rendered. 
-			_.bindAll(this, 'render', 'calculateTotalScore'); //keeps 'this' this in afterRender
+			_.bindAll(this, 'render', 'calculateTotalScore', 'createEntry'); //keeps 'this' this in afterRender
             this.render = _.wrap(this.render, function(render) {
                 render();
                 this.afterRender();
@@ -250,9 +250,22 @@
 			var econ_cit_input_skeleton_html = window.JST['econ_cit_input_skeleton'];
 			$("#econ-cit-container").append(econ_cit_input_skeleton_html);
 			$('#total-score-button').click(this.calculateTotalScore);
-
-
 			$('#logout-button').click(this.logout);
+			$('#create-entry-button').click(this.createEntry);//temporary
+		},
+		createEntry: function(){
+			console.log("so you wanna make a new entry?");
+			var uid = this.model.get("_id")
+			var url = CONFIG.base_url + "createEntry/" + uid;
+			$.ajax({
+				url: url, 
+				success : function(data, status, jqXHR){
+					console.log(JSON.stringify(data));
+				},
+				error: function(jqXHR, status, errorThrown){
+					console.log("ERROR: " + status);
+				}
+			});
 		},
 		afterRender: function(){
 			console.log("after render")
