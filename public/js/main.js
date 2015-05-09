@@ -229,6 +229,118 @@
 		}
 	});
 
+
+/* The Entry model just allows us to make an Entry-based views. 
+*/
+	var Entry = Backbone.Model.extend({
+		//create by passing the user's entry object, which is already json
+	});
+
+/*Assumes this must be passed an Entry model that is composed of an entry from
+the user's entry list, AUGMENTED with a 'uid' field that is the user's id. 
+*/
+	var EntryDisplayView = Backbone.View.extend({
+		initialize: function(){
+			_.bindAll(this, 'render', 'goToEdit');
+			this.render();
+		},
+		render: function(){
+			var entry_id = this.model.get("_id");
+			console.log("entry id: " + entry_id);
+			var uid = this.model.get("uid");
+			var info_string = JSON.stringify(this.model);
+			var entry_data = {"info":info_string, "entry_id": entry_id}
+			var entry_display_template  = window.JST['entry_display'];
+			var html = entry_display_template(entry_data);
+			$("#entry-list-container").append(html);
+			var button_selector = "#edit-" + entry_id;
+			$(button_selector).click(this.goToEdit);
+		}, 
+		goToEdit :function(){
+			console.log("So you want to edit entry id: " + this.model.get("_id"));
+			//var navigation_string = "edit/" + this.model.get("uid") + "/" + this.model.get("_id"); 
+			//app.navigate(navigation_string, {trigger: true});
+		}
+	})
+
+
+
+/* To avoid having to deal with a collection view, the model for EntriesDisplayView is 
+actually a User. afterRender treats the user's entries as a collection without having
+to mess with collection views. 
+*/
+	var UserEntriesDisplayView = Backbone.View.extend({
+		el: $('#econ-cit-container')
+	,   initialize: function(){
+			_.bindAll(this, 'render', 'createEntry'); 
+            this.render = _.wrap(this.render, function(render) {	//keeps 'this' this in afterRender
+                render();
+                this.afterRender();
+            });
+			this.render(); 
+		}
+	,   render: function(){
+			var display_skeleton_html = window.JST['display_skeleton'];
+			$('#econ-cit-container').html(display_skeleton_html);
+			$('#create-entry-button').click(this.createEntry);
+		}
+	, 	afterRender: function(){
+			var entries = this.model.get("entries");
+			var uid = this.model.get("_id");
+			_.each(entries, function(entry, index, list){
+					entry["uid"] = uid;
+					var entry_model = new Entry(entry);
+					var entry_display_view = new EntryDisplayView({model: entry_model})
+			});
+		}
+	, 	createEntry: function(){
+			console.log("so you wanna make a new entry?");
+			var uid = this.model.get("_id")
+			var url = CONFIG.base_url + "createEntry/" + uid;
+			$.ajax({
+				url: url, 
+				success : function(data, status, jqXHR){
+					console.log(JSON.stringify(data));
+				},
+				error: function(jqXHR, status, errorThrown){
+					console.log("ERROR: " + status);
+				}
+			});
+		}
+	});
+
+	var UserHomeView = Backbone.View.extend({
+		el: $('#user-home-container')
+	,	initialize : function(){
+			console.log("init user view");
+			//the following lines allow us to render category views after the user view is rendered. 
+			_.bindAll(this, 'render'); //keeps 'this' this in afterRender
+			this.render(); 
+		}
+	,	render: function(){
+			var username = this.model.get("username");
+			var skeleton_template = window.JST['user_skeleton'];
+			$(this.el).html(skeleton_template({"username" : username}));
+			$('#logout-button').click(this.logout);
+			var entries_display = new UserEntriesDisplayView({model: this.model}); //pass user as model to entriesDisplayView
+		}
+	,   logout : function(e){
+        	var url = CONFIG.base_url + "logout";
+			$.ajax({
+				url: url,
+				success: function(){
+					alert("You're logged out.");
+					app.navigate("", {trigger: true});
+					
+				},
+				error : function(){
+					alert("Please close your browser to logout.");
+					app.navigate("", {trigger: true});
+				}
+			});
+		}
+	})
+
 	var UserView = Backbone.View.extend({
 		el: $('#user-home-container'),
 		events: {},
@@ -251,7 +363,7 @@
 			$("#econ-cit-container").append(econ_cit_input_skeleton_html);
 			$('#total-score-button').click(this.calculateTotalScore);
 			$('#logout-button').click(this.logout);
-			$('#create-entry-button').click(this.createEntry);//temporary
+			$('#create-entry-button-old').click(this.createEntry);//temporary
 		},
 		createEntry: function(){
 			console.log("so you wanna make a new entry?");
@@ -359,7 +471,8 @@
 			user.fetch({
 				success: function(user, res){
 					//can we attach user view to the app object somehow?
-					var user_view = new UserView({model: user});
+					//var user_view = new UserView({model: user});
+					var user_view = new UserHomeView({model: user});
 				},
 				error: function(user, res){
 					console.log("after fetch: " + JSON.stringify(res));

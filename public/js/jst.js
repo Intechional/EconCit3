@@ -38,11 +38,20 @@ window.JST['user_skeleton'] = _.template(
             <div class="text-center">\
                 You are logged in as <%=username%> --- \
                 <button id="logout-button" class="btn btn-xm">Logout</button>\
-                <button id="create-entry-button" class="btn btn-xm">Create Entry</button>\
             </div>\
         </div>\
         <div id="econ-cit-container"></div>'
 );
+
+window.JST['display_skeleton'] = _.template(
+    '<button class="center" id="create-entry-button" class="btn btn-default">New Economic Citizenship Entry</button>\
+    <div id="entry-list-container"></div>'
+);
+
+window.JST['entry_display'] = _.template(
+    '<div><%=info%> <button class="center" id="edit-<%=entry_id%>" class="btn btn-default">Edit</button> </div>'
+);
+
 /*This template is the skeleton for all the econ cit category 
 input forms. It must be in the dom before the tabs and inputs 
 are added.*/
