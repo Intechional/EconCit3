@@ -19,8 +19,7 @@ var UserSchema = new Schema({
 		password: String,
 		email: String,
 		county:String,
-		econCitData: Object
-		//can add date and other attributes if need be. 
+		entries: [] 
 })
 
 module.exports.UserModel = mongoose.model('User', UserSchema);

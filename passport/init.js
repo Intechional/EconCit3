@@ -48,6 +48,8 @@ module.exports = function(passport){
                         newUser.password = createHash(password);
                         newUser.email = req.body.email;
                         newUser.county = req.body.county;
+                        //create empty entries field
+                        newUser.entries = [];
                         // save the user
                         newUser.save(function(err) {
                             if (err){
