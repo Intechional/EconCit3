@@ -83,6 +83,42 @@ This method uses passportjs to handle authorization and sessions.
 	
 	router.get('/users/:uid', isAuthenticated, UserRoutes.getUser);
 	router.get('/createEntry/:uid', isAuthenticated, UserRoutes.createEntry);
+	router.get('/getEntry/:uid/:entry_id', isAuthenticated, UserRoutes.getEntry);
+	router.post('/updateEntry/:uid', isAuthenticated, function(req, res){
+		var uid = req.params.uid;
+		var entry_id = req.params.entry_id;
+		console.log("updating user: " + uid + ", entry: " + entry_id);
+		UserModel.findById(uid, function(err, foundUser){
+			if(!err){
+				var entries = foundUser["entries"]; //need to check it's not undefined
+				var oldEntry =_und.findWhere(entries, {_id: entry_id})//need to check it's not undefined
+				var index =  entries.map(function(e) { return e._id; }).indexOf(entry_id);
+				var cat_name = Object.keys(req.body)[0];
+				var cat_names = EconCit.getCategoriesShallow();
+				if(EconCit.getCategoriesShallow().indexOf(cat_name) > -1){ // lazy validation
+					oldEntry["data"][cat_name] = req.body[cat_name];//coupled with schema
+					foundUser.entries[index] = oldEntry;
+					//attempt save
+					foundUser.markModified('entries'); //necessary to update this object that is a property of foundUser
+					foundUser.save(function (err) {
+	  					if (!err){
+	  						console.log("Updated user info. Id: " + uid);
+	  						return res.send({status: true, msg: "Entry updated."});
+	  					}else{
+	  						console.log("ERROR: failed to update user. Id: " + uid);
+	  						return res.send({status: false, msg: "Entry update failed."});
+	  					}
+	  				});
+				}else{
+					console.log("invalid category name in updateUserData request: " + cat_name);
+				}
+			}else{ //err on UserModel.findById
+				console.log("ERROR: user not found in db after auth, in updateEntry. Id: " + uid);
+				console.log(JSON.stringify(err));
+				return res.send({status: false, msg: "User not found. Database error."});
+			}
+		});	
+	});
 
 /*This method currently  assumes only one entry per user, and only updates category info. 
 It needs to be generalized to handle updates to other entry attributes, choose a specific entry,
@@ -90,7 +126,7 @@ and update other user info.*/
 	router.post('/updateUserData/:uid', isAuthenticated, function(req, res){
 		var uid = req.params.uid;
 		console.log("updating user: " + uid);
-		User.findById(uid, function(err, foundUser){
+		UserModel.findById(uid, function(err, foundUser){
 			if(!err){
 				console.log("found user to update: " + JSON.stringify(foundUser));
 				console.log(JSON.stringify(req.body));

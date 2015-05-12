@@ -40,15 +40,11 @@ exports.createEntry = function(req, res){
 	console.log("creating entry for user: " + uid);
 	UserModel.findById(uid, function(err, foundUser){
 			if(!err){
-				console.log("found user: " + JSON.stringify(foundUser));
-				var entries = foundUser["entries"];
-				console.log("Entries before push: " + JSON.stringify(entries));
+				//console.log("found user: " + JSON.stringify(foundUser));
+				//console.log("Entries before push: " + JSON.stringify(entries));
 				var new_entry = new EconCitEntryModel;
 				foundUser.entries.push(new_entry);
-				console.log("Entries after push: " + JSON.stringify(entries));
-				//entries.push({}); //see if this is given an id
-				//foundUser['entries'] = entries;
-				//foundUser.markModified('entries');
+				//console.log("Entries after push: " + JSON.stringify(entries));
 				foundUser.save(function (err) {
   					if (!err){
   						console.log("Created entry for user with id: " + uid);
@@ -59,8 +55,7 @@ exports.createEntry = function(req, res){
   						console.log(JSON.stringify(err));
   						return res.send({status: false, msg: "There was a problem creating a new entry."});
   					}
-  				});
-				
+  				});				
 			}else{
 				console.log("ERROR: user not found in db after auth. Id: " + uid);
 				return res.send({status: false, msg: "User not found. Entry not created. Database error."});
@@ -93,7 +88,7 @@ exports.getEntry = function(req, res){
 	console.log("in getEntry");
 	var uid = req.body.uid;
 	var entry_id = req.body.entry_id;
-	console.log("user id: " + uid + " entry_id: " +entry_id);
+	console.log("user id: " + uid + " entry_id: " + entry_id);
 	UserModel.findById(uid, function(err, foundUser){
 		if(!err){
 			var entries = foundUser["entries"]; 
@@ -101,7 +96,8 @@ exports.getEntry = function(req, res){
 			if(!(entry === undefined)){
 				return res.send(entry);
 			}else{
-				console.log("ERROR: :Entry not found");
+				console.log("ERROR: Entry not found");
+				console.log(JSON.stringify(err));
 				return res.send({status: false, msg: "Entry not found."});
 			}
 		}else{
@@ -114,7 +110,7 @@ exports.getEntry = function(req, res){
 /*updateEntry requires a uid and an entry_id to be available in the request body.
 Updates the entry. Response contains updated entry. 
 
-PSUEDOCODE. NOT TESTED. MUST CHANGE SO THAT 
+PSUEDOCODE. NOT TESTED. 
 */
 exports.updateEntry = function(req, res){
 	var uid = req.params.uid;
@@ -128,7 +124,7 @@ exports.updateEntry = function(req, res){
 			var cat_name = Object.keys(req.body)[0];
 			var cat_names = EconCit.getCategoriesShallow();
 			if(EconCit.getCategoriesShallow().indexOf(cat_name) > -1){ // lazy validation
-				oldEntry[cat_name] = req.body[cat_name];
+				oldEntry["data"][cat_name] = req.body[cat_name];//coupled with schema
 				foundUser.entries[index] = oldEntry;
 				//attempt save
 				foundUser.markModified('entries'); //necessary to update this object that is a property of foundUser

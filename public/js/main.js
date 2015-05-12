@@ -130,12 +130,14 @@
 	        var selector = "#" + this.model.get("name") + "_inputs_container"
 	        var input_template = window.JST['input_basic'] ;
 	        var cat_name = this.model.get("name");
-	        var econCitData = this.model.get("user").get("econCitData");
+	        var user_data = this.model.get("user_data");
 	        _.each(input_keys, function(input_key, index, list){
-	        	var input_value = cat_inputs[input_key];
-	        	if(!(econCitData === undefined)){
-	        		if(!(econCitData[cat_name] === undefined)){
-	        			if(!(econCitData[cat_name][input_key] === undefined)){
+	        	var input_value = cat_inputs[input_key];//input value is default
+	        	/*note: we do all this checking here so that we can save init the "data" field of an economic citizenship entry 
+	        	to empty (so that the server's model code, and code here, is not coupled with the econ-cit.js module). JS tends to ignore fields whose values are empty objects*/
+	        	if(!(user_data === undefined)){//replace input value with user's saved value, if available
+	        		if(!(user_data[cat_name] === undefined)){
+	        			if(!(user_data[cat_name][input_key] === undefined)){
 	        				input_value = econCitData[cat_name][input_key];
 	        			}
 	        		}
@@ -168,7 +170,8 @@
 		saveCategoryInfo: function(e){
 			e.stopImmediatePropagation();
         	e.preventDefault();
-        	var user_model = this.model.get("user");
+        	var uid = this.model.get("uid");
+        	var entry_id = this.model.get("entry_id");
 	        var cat_name = this.model.get("name");
 	        var cat_inputs = this.model.get("inputs");
 	        var cat_info ={}; 
@@ -181,13 +184,16 @@
         	//assume valid for now:
         	if(this.infoIsValid(cat_info)){
 	        	var save_data_url_base =  CONFIG.base_url + "updateUserData/";
-	            var save_data_url = save_data_url_base + user_model.get("_id");
+	        	//var save_data_url_base = CONFIG.base_url + "updateEntry/";
+	            var save_data_url = save_data_url_base + uid; //+ "/" //+ entry_id;
+	           	console.log("save_data_url: " + save_data_url);
 	            var data_to_send = {};
 	            data_to_send[cat_name] = cat_info;
 	            var catView = this;
-	            $.ajax(save_data_url, {
+	            $.ajax( {
+	            	url: save_data_url,
 	                type: "POST",
-	                dataType: "json",
+	                //dataType: "json",
 	                data: data_to_send,
 	                success: function(response){
 	                    console.log(response);
@@ -258,8 +264,9 @@ the user's entry list, AUGMENTED with a 'uid' field that is the user's id.
 		}, 
 		goToEdit :function(){
 			console.log("So you want to edit entry id: " + this.model.get("_id"));
-			//var navigation_string = "edit/" + this.model.get("uid") + "/" + this.model.get("_id"); 
+			//var navigation_string = "editEntry/" + this.model.get("uid") + "/" + this.model.get("_id"); 
 			//app.navigate(navigation_string, {trigger: true});
+			app.editEntry(this.model.get("uid"), this.model.get("_id") );
 		}
 	})
 
@@ -340,6 +347,46 @@ to mess with collection views.
 			});
 		}
 	})
+
+/*EntryEditView assumes it is  passed an Entry model that is composed of an entry from
+the user's entry list, AUGMENTED with a 'uid' field that is the user's id
+*/
+	var EntryEditView = Backbone.View.extend({
+		el: $('#econ-cit-container')
+	,	initialize: function(){
+			_.bindAll(this, 'render'); 
+            this.render = _.wrap(this.render, function(render) {//keeps 'this' this in afterRender
+                render();
+                this.afterRender();
+            });
+			this.render(); 
+		}
+	,	render: function(){
+			var econ_cit_input_skeleton_html = window.JST['econ_cit_input_skeleton'];
+			$("#econ-cit-container").html(econ_cit_input_skeleton_html); //replace display view
+			//$('#total-score-button').click(this.calculateTotalScore);
+		}
+	,	afterRender:function(){
+			console.log(JSON.stringify(this.model));
+			var uid = this.model.get("uid"); //the model of this view is an entry, that has been AUGMENTED with uid field
+			var user_data = this.model.get("data"); //will be undefined if user has no data saved
+			var entry_id = this.model.get("_id");
+			var cats_deep = EconCit.getCategoriesDeep();
+			var cat_names = EconCit.getCategoriesShallow();
+			console.log(JSON.stringify(cat_names));
+			_.each(cat_names, function(cat_name, index, list){
+				var cat = cats_deep[cat_name];
+				cat["name"] = cat_name; //make key a 'name' property of object
+				cat["uid"] = uid;//makes sure cat view has access to user's id
+				cat["entry_id"] = entry_id;
+				cat["user_data"] = user_data// passing user's data for all categories
+				//create new model from cat, which now also contains the user, and make a view:
+				var cat_model = new EconCitCategory(cat);
+				var cat_view = new EconCitCategoryView({model: cat_model});
+			});
+			$('.tab-pane:first').addClass("active");//ensures the first tab is visible
+		}
+	});
 
 	var UserView = Backbone.View.extend({
 		el: $('#user-home-container'),
@@ -454,7 +501,8 @@ to mess with collection views.
 		routes: {
 			"": "login",
 			"signup" : "register",
-			"home/:id" : "home"
+			"home/:id" : "home",
+			"editEntry/:uid/:entry_id" : "editEntry"
 		},
 		login: function(){
 			this.login_view = new LoginView();
@@ -464,10 +512,7 @@ to mess with collection views.
 			this.register_view = new RegisterView();
 		},
 		home: function(id){
-			console.log("home for user with id:" + id);
 			var user = new User({_id: id});
-			console.log("user _id attr: " + user.get("_id"));
-			console.log("before fetch: " + JSON.stringify(user));
 			user.fetch({
 				success: function(user, res){
 					//can we attach user view to the app object somehow?
@@ -477,15 +522,34 @@ to mess with collection views.
 				error: function(user, res){
 					console.log("after fetch: " + JSON.stringify(res));
 				}
+			});	
+		},
+		editEntry: function(uid, entry_id){
+			console.log("in editEntry");
+			var user = new User({_id: uid});
+			//fetches user because I was blocked by wierd CORS issues with a raw ajax to getEntry on the backend
+			user.fetch({
+				success: function(user, res){
+					var entries = user.get('entries');
+					var entry = _.findWhere(entries, {_id: entry_id});
+					console.log(JSON.stringify(entry));
+					entry["uid"] = user.get("_id");
+					entry = new Entry(entry);
+					//entry model now has uid attached
+					var entry_edit_view = new EntryEditView({model:entry});
+				},
+				error: function(user, res){
+					console.log("after fetch: " + JSON.stringify(res));
+				}
 			});
-			
+
 		}
 	});
 
 	//TODO: programmatically match CONFIG with Heroku enviro variables
 	var CONFIG = {};
-	//var base_url = window.location.href;
-	var base_url = "http://localhost:5000/";
+	var base_url = window.location.href;
+	//var base_url = "http://localhost:5000/";
 	//var base_url = "https://econ-cit3.herokuapp.com/"
 	console.log("base_url set to : " + base_url);
 	CONFIG["base_url"] = base_url;

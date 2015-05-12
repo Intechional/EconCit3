@@ -4,14 +4,15 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-
 var EconCitEntry = new Schema({
 		start: Date, 
 		end: Date,
 		created: {type:Date, default: Date.now},
-		data: Object
+		data: {type:Object, default: {}}
+	},
+	{minimize:false}//allows data's default to be empty object
 		//score: Number //this may be an object later
-});
+);
 
 var UserSchema = new Schema({
 		id:String,
