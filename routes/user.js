@@ -112,7 +112,8 @@ Updates the entry. Response contains updated entry.
 
 PSUEDOCODE. NOT TESTED. 
 */
-exports.updateEntry = function(req, res){
+exports.updateEntry2 = function(req, res){
+	console.log("in top update entry");
 	var uid = req.params.uid;
 	var entry_id = req.params.entry_id;
 	console.log("updating user: " + uid + ", entry: " + entry_id);
@@ -153,38 +154,40 @@ exports.updateEntry = function(req, res){
 /*This method currently  assumes only one entry per user, and only updates category info. 
 It needs to be generalized to handle updates to other entry attributes, choose a specific entry,
 and update other user info.*/
-exports.updateEntry= function(req, res){
+exports.updateEntryData= function(req, res){
+	console.log("in bottom update entry");
 	var uid = req.params.uid;
 	var entry_id = req.params.entry_id;
-	console.log("updating user: " + uid);
+	console.log("updating user: " + uid  +" for entry: " + entry_id);
 	UserModel.findById(uid, function(err, foundUser){
 		if(!err){
 			console.log("found user to update: " + JSON.stringify(foundUser));
-			console.log(JSON.stringify(req.body));
-			if(foundUser.entries.length === 0){
-				foundUser["entries"].push({});
-			}
-			var oldData = foundUser.entries[0]; //temporary - testing array in schema
-			//assumes only one cat updated at a time
-			//needs validation
 			console.log("req body: " + JSON.stringify(req.body));
+			var entries = foundUser["entries"]; 
+			console.log("entries: " + JSON.stringify(entries));
+			//findWhere might be better here
+			var oldEntry = _und.find(entries, function(e){return e["_id"] == entry_id})
+			console.log("oldEntry: " + JSON.stringify(oldEntry));
+			var index = entries.indexOf(oldEntry);
+			console.log("index of oldEntry 2nd way: " + index);
+			var entry_data = oldEntry["data"];
+			//TODO: validation
+			//assumes only one cat updated at a time
 			var cat_name = Object.keys(req.body)[0];
-			console.log("cat_name: " + cat_name);
 			var cat_names = EconCit.getCategoriesShallow();
-			console.log("cat names: " + cat_names);
-			if(EconCit.getCategoriesShallow().indexOf(cat_name) > -1){ // lazy validation
-				oldData[cat_name] = req.body[cat_name];
-				foundUser.entries[0] = (oldData);
+			if(cat_names.indexOf(cat_name) > -1){ // lazy validation
+				entry_data[cat_name] = req.body[cat_name];
+				foundUser.entries[index].data = entry_data;
 				//attempt save
 				foundUser.markModified('entries'); //necessary to update this object that is a property of foundUser
 				foundUser.save(function (err) {
 				//for now, assume only one entry. Only cases are zero or 1 entries
   					if (!err){
-  						console.log("Updated user info. Id: " + uid);
-  						return res.send({status: true, msg: "User data updated."});
+  						console.log("Updated user entry " + entry_id + " for user " + uid);
+  						return res.send({status: true, msg: "Entry data updated."});
   					}else{
   						console.log("ERROR: failed to update user. Id: " + uid);
-  						return res.send({status: false, msg: "User data update failed."});
+  						return res.send({status: false, msg: "Entry data update failed."});
   					}
   				});
 			}else{

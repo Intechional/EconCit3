@@ -138,7 +138,7 @@
 	        	if(!(user_data === undefined)){//replace input value with user's saved value, if available
 	        		if(!(user_data[cat_name] === undefined)){
 	        			if(!(user_data[cat_name][input_key] === undefined)){
-	        				input_value = econCitData[cat_name][input_key];
+	        				input_value = user_data[cat_name][input_key];
 	        			}
 	        		}
 	        	}
@@ -184,7 +184,7 @@
         	//assume valid for now:
         	if(this.infoIsValid(cat_info)){
 	        	//var save_data_url_base =  CONFIG.base_url + "updateUserData/";
-	        	var save_data_url_base = CONFIG.base_url + "updateEntry/";
+	        	var save_data_url_base = CONFIG.base_url + "updateEntryData/";
 	            var save_data_url = save_data_url_base + uid+ "/" + entry_id;
 	           	console.log("save_data_url: " + save_data_url);
 	            var data_to_send = {};
@@ -527,7 +527,7 @@ the user's entry list, AUGMENTED with a 'uid' field that is the user's id
 		editEntry: function(uid, entry_id){
 			console.log("in editEntry");
 			var user = new User({_id: uid});
-			//fetches user because I was blocked by wierd CORS issues with a raw ajax to getEntry on the backend
+			//hack:fetches user because I was blocked by wierd CORS issues with a raw ajax to getEntry on the localhost
 			user.fetch({
 				success: function(user, res){
 					var entries = user.get('entries');
