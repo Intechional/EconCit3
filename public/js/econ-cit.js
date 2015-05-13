@@ -478,7 +478,7 @@
 
 	/*usage: EconCit.validate(category, cat_info) where cat_info is a map of the 
 	category's inputs to the user's input value for that input.
-	**return: true/false status and a message
+	**return: object with key 'status' that is true or false,  key 'msg' with message
 	*/
 
 	exports.validate = function(category_name, cat_info){
@@ -488,9 +488,7 @@
 		var input_keys = Object.keys(cat_info) //should match categories["inputs"]
 		input_keys.forEach(function(input_key){
 			var key = cat_name + "." + input_key
-			console.log(key)
 			var result = _validate(validationRules[key], cat_info[input_key])
-			console.log("result in validate:" + JSON.stringify(result))
 			if (result["status"] === false){
 				//console.log("bad input: " + result["msg"]);
 				errorMessages.push(result["msg"]);

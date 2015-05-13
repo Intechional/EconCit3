@@ -107,51 +107,11 @@ exports.getEntry = function(req, res){
 	});
 }
 
-/*updateEntry requires a uid and an entry_id to be available in the request body.
-Updates the entry. Response contains updated entry. 
 
-PSUEDOCODE. NOT TESTED. 
-*/
-exports.updateEntry2 = function(req, res){
-	console.log("in top update entry");
-	var uid = req.params.uid;
-	var entry_id = req.params.entry_id;
-	console.log("updating user: " + uid + ", entry: " + entry_id);
-	UserModel.findById(uid, function(err, foundUser){
-		if(!err){
-			var entries = foundUser["entries"]; //need to check it's not undefined
-			var oldEntry =_und.findWhere(entries, {_id: entry_id})//need to check it's not undefined
-			var index =  entries.map(function(e) { return e._id; }).indexOf(entry_id);
-			var cat_name = Object.keys(req.body)[0];
-			var cat_names = EconCit.getCategoriesShallow();
-			if(EconCit.getCategoriesShallow().indexOf(cat_name) > -1){ // lazy validation
-				oldEntry["data"][cat_name] = req.body[cat_name];//coupled with schema
-				foundUser.entries[index] = oldEntry;
-				//attempt save
-				foundUser.markModified('entries'); //necessary to update this object that is a property of foundUser
-				foundUser.save(function (err) {
-  					if (!err){
-  						console.log("Updated user info. Id: " + uid);
-  						return res.send({status: true, msg: "Entry updated."});
-  					}else{
-  						console.log("ERROR: failed to update user. Id: " + uid);
-  						return res.send({status: false, msg: "Entry update failed."});
-  					}
-  				});
-			}else{
-				console.log("invalid category name in updateUserData request: " + cat_name);
-			}
-		}else{ //err on UserModel.findById
-			console.log("ERROR: user not found in db after auth, in updateEntry. Id: " + uid);
-			console.log(JSON.stringify(err));
-			return res.send({status: false, msg: "User not found. Database error."});
-		}
-	});
-}
-
-
-//temp fn to test exporting fns from here to index.js
-/*This method currently  assumes only one entry per user, and only updates category info. 
+/*updateEntryData requires a uid and an entry_id to be available in the request body.
+It expects the body to contain one key that matches the name of the category being updated.
+The value of the cat_name key is a hash of the category's inputs to the user's values for those inputs. 
+Updates the entry. Response contains updated entry. This method currently  assumes only one entry per user, and only updates category info. 
 It needs to be generalized to handle updates to other entry attributes, choose a specific entry,
 and update other user info.*/
 exports.updateEntryData= function(req, res){
@@ -167,31 +127,33 @@ exports.updateEntryData= function(req, res){
 			console.log("entries: " + JSON.stringify(entries));
 			//findWhere might be better here
 			var oldEntry = _und.find(entries, function(e){return e["_id"] == entry_id})
-			console.log("oldEntry: " + JSON.stringify(oldEntry));
 			var index = entries.indexOf(oldEntry);
-			console.log("index of oldEntry 2nd way: " + index);
 			var entry_data = oldEntry["data"];
-			//TODO: validation
 			//assumes only one cat updated at a time
 			var cat_name = Object.keys(req.body)[0];
 			var cat_names = EconCit.getCategoriesShallow();
 			if(cat_names.indexOf(cat_name) > -1){ // lazy validation
-				entry_data[cat_name] = req.body[cat_name];
-				foundUser.entries[index].data = entry_data;
-				//attempt save
-				foundUser.markModified('entries'); //necessary to update this object that is a property of foundUser
-				foundUser.save(function (err) {
-				//for now, assume only one entry. Only cases are zero or 1 entries
-  					if (!err){
-  						console.log("Updated user entry " + entry_id + " for user " + uid);
-  						return res.send({status: true, msg: "Entry data updated."});
-  					}else{
-  						console.log("ERROR: failed to update user. Id: " + uid);
-  						return res.send({status: false, msg: "Entry data update failed."});
-  					}
-  				});
+				var validationResult = EconCit.validate(cat_name, req.body[cat_name]);
+				if(validationResult["status"]){
+					entry_data[cat_name] = req.body[cat_name];
+					foundUser.entries[index].data = entry_data;
+					//attempt save
+					foundUser.markModified('entries'); //necessary to update this object that is a property of foundUser
+					foundUser.save(function (err) {
+					//for now, assume only one entry. Only cases are zero or 1 entries
+	  					if (!err){
+	  						console.log("Updated user entry " + entry_id + " for user " + uid);
+	  						return res.send({status: true, msg: "Entry data updated."});
+	  					}else{
+	  						console.log("ERROR: failed to update user. Id: " + uid);
+	  						return res.send({status: false, msg: "Entry data update failed."});
+	  					}
+  					});
+				}else{
+					console.log("invalid category data in updateEntryData request: " + cat_name);
+				}
 			}else{
-				console.log("invalid category name in updateUserData request: " + cat_name);
+				console.log("invalid category name in updateEntryData request: " + cat_name);
 			}
 		}else{
 			console.log("ERROR: user not found in db after auth. Id: " + uid);
