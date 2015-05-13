@@ -183,9 +183,9 @@
         	});
         	//assume valid for now:
         	if(this.infoIsValid(cat_info)){
-	        	var save_data_url_base =  CONFIG.base_url + "updateUserData/";
-	        	//var save_data_url_base = CONFIG.base_url + "updateEntry/";
-	            var save_data_url = save_data_url_base + uid; //+ "/" //+ entry_id;
+	        	//var save_data_url_base =  CONFIG.base_url + "updateUserData/";
+	        	var save_data_url_base = CONFIG.base_url + "updateEntry/";
+	            var save_data_url = save_data_url_base + uid+ "/" + entry_id;
 	           	console.log("save_data_url: " + save_data_url);
 	            var data_to_send = {};
 	            data_to_send[cat_name] = cat_info;

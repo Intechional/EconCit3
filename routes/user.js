@@ -153,8 +153,9 @@ exports.updateEntry = function(req, res){
 /*This method currently  assumes only one entry per user, and only updates category info. 
 It needs to be generalized to handle updates to other entry attributes, choose a specific entry,
 and update other user info.*/
-exports.updateUserData= function(req, res){
+exports.updateEntry= function(req, res){
 	var uid = req.params.uid;
+	var entry_id = req.params.entry_id;
 	console.log("updating user: " + uid);
 	UserModel.findById(uid, function(err, foundUser){
 		if(!err){
