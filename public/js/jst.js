@@ -3,7 +3,7 @@ window.JST = {};
 
 window.JST['login'] = _.template(
 	'<div>\
-        <h1>Sign into the Economic Citizenship App:</h1>\
+        <h4>Sign into the Economic Citizenship App:</h4>\
         <div id="account-wall">\
             <form id="login-form" class="form-signin" action="/login" method="POST" role="form">\
             <input type="text" id="login-username" name="username" class="form-control" placeholder="Username">\
@@ -43,27 +43,52 @@ window.JST['user_skeleton'] = _.template(
         <div id="econ-cit-container"></div>'
 );
 
+window.JST['create_entry'] = _.template(
+    '<h4>Create a new Economic Citizenship Entry:</h4>\
+    <form class="form-inline">\
+        <div class="form-group">\
+            <label for="new_entry_name">Name</label>\
+            <input type="text" class="form-control" placeholder="Example Entry" id="new_entry_name" value="">\
+        </div>\
+        <div class="form-group">\
+            <label>Start date:</label>\
+            <input type="date" class="form-control" id="start_date" value="">\
+        </div>\
+        <div class="form-group">\
+            <label>End date:</label>\
+            <input type="date" class="form-control" id="end_date" value="">\
+        </div>\
+        <button class="btn btn-default" id="create-entry-button" class="btn btn-default">Create</button>\
+    </form>\
+    <div class="error-container"></div>'
+);
+
 window.JST['display_skeleton'] = _.template(
-    '<button class="center" id="create-entry-button" class="btn btn-default">New Economic Citizenship Entry</button>\
-    <div id="entry-list-container"></div>'
+    '<div class="container center-block" id="create_entry_container"></div>\
+    <div class="container center-block" id="entry-list-container">\
+        <h4>Your economic citizenship entries:</h4>\
+        <ul id="entry-list" class="list-group"></ul>\
+    </div>'
 );
 
 window.JST['entry_display'] = _.template(
-    '<div><%=info%> <button class="center" id="edit-<%=entry_id%>" class="btn btn-default">Edit</button> </div>'
+    '<li class="list-group-item"> <%=info%> <button class="center" id="edit-<%=entry_id%>" class="btn btn-default">Edit</button> </li>'
 );
 
 /*This template is the skeleton for all the econ cit category 
 input forms. It must be in the dom before the tabs and inputs 
 are added.*/
 window.JST['econ_cit_input_skeleton'] = _.template(
-    '<div role="tabpanel">\
+    '<div>You are editing Entry with id: <%= entry_id%> </div>\
+    <div role="tabpanel">\
         <ul class="nav nav-tabs" role="tablist"></ul>\
     </div>\
     <div class="tab-content"></div>\
     <div class="well well-sm text-center">\
-        <div id="score_container"></div>\
+        <div id="score-container"></div>\
         <button class="center" id="total-score-button" class="btn btn-default">Calculate Economic Citizenship Score</button>\
-    </div>'
+        <button class="center" id="clear-score-button" class="btn btn-default">Clear Score Information</button>\
+        </div>'
 );
 
 window.JST['tab_nav_basic'] = _.template(

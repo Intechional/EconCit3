@@ -5,3 +5,9 @@
 .float-left:{
 	float:left;
 }
+
+h4{
+	color: orange;
+	text-transform: uppercase;
+	font-weight: bold;
+}

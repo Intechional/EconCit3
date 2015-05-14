@@ -208,19 +208,20 @@
 	        }
 		},
 		updateScore: function(cat_name, cat_info){
-			this.model.get("user").fetch({
-				success: function(){
+			//var user = new User({_id: this.model.get("uid")});
+			//user.fetch({
+				//success: function(){
 					console.log("fetched user, updating score");
-					var el = "#score_container";
+					var el = "#score-container";
 					var score = EconCit.getSubScore(cat_name, cat_info);
 					var score_html = "<p>Your subscore for the " + cat_name + " category is: " + score + "</p>";
 					$(el).append(score_html);
 					console.log("update score");
-				},
-				error: function(){
-					console.log("error fetching user on updateScore");
-				}
-			});
+				//},
+				// error: function(){
+				// 	console.log("error fetching user on updateScore");
+				// }
+			//});
 
 		}
 	});
@@ -258,7 +259,7 @@ the user's entry list, AUGMENTED with a 'uid' field that is the user's id.
 			var entry_data = {"info":info_string, "entry_id": entry_id}
 			var entry_display_template  = window.JST['entry_display'];
 			var html = entry_display_template(entry_data);
-			$("#entry-list-container").append(html);
+			$("#entry-list").append(html);
 			var button_selector = "#edit-" + entry_id;
 			$(button_selector).click(this.goToEdit);
 		}, 
@@ -289,6 +290,8 @@ to mess with collection views.
 	,   render: function(){
 			var display_skeleton_html = window.JST['display_skeleton'];
 			$('#econ-cit-container').html(display_skeleton_html);
+			var create_entry_html = window.JST['create_entry'];
+			$('#create_entry_container').html(create_entry_html);
 			$('#create-entry-button').click(this.createEntry);
 		}
 	, 	afterRender: function(){
@@ -300,17 +303,23 @@ to mess with collection views.
 					var entry_display_view = new EntryDisplayView({model: entry_model})
 			});
 		}
-	, 	createEntry: function(){
+	, 	createEntry: function(e){
+			e.preventDefault();
 			console.log("so you wanna make a new entry?");
 			var uid = this.model.get("_id")
 			var url = CONFIG.base_url + "createEntry/" + uid;
+			console.log(url);
 			$.ajax({
 				url: url, 
 				success : function(data, status, jqXHR){
 					console.log(JSON.stringify(data));
+					var new_entry = data["data"];
+					console.log(JSON.stringify(new_entry));
+					var entry_id = new_entry["_id"];
+					app.editEntry(uid,entry_id );
 				},
 				error: function(jqXHR, status, errorThrown){
-					console.log("ERROR: " + status);
+					console.log("ERROR: " + JSON.stringify(jqXHR) + status + JSON.stringify(errorThrown));
 				}
 			});
 		}
@@ -354,7 +363,7 @@ the user's entry list, AUGMENTED with a 'uid' field that is the user's id
 	var EntryEditView = Backbone.View.extend({
 		el: $('#econ-cit-container')
 	,	initialize: function(){
-			_.bindAll(this, 'render'); 
+			_.bindAll(this, 'render', 'calculateTotalScore', 'clearScoreInfo'); 
             this.render = _.wrap(this.render, function(render) {//keeps 'this' this in afterRender
                 render();
                 this.afterRender();
@@ -363,8 +372,56 @@ the user's entry list, AUGMENTED with a 'uid' field that is the user's id
 		}
 	,	render: function(){
 			var econ_cit_input_skeleton_html = window.JST['econ_cit_input_skeleton'];
-			$("#econ-cit-container").html(econ_cit_input_skeleton_html); //replace display view
-			//$('#total-score-button').click(this.calculateTotalScore);
+			$("#econ-cit-container").html(econ_cit_input_skeleton_html({entry_id: this.model.get("_id")})); //replace display view
+			$('#total-score-button').click(this.calculateTotalScore);
+			$('#clear-score-button').click(this.clearScoreInfo);
+		}
+	, 	clearScoreInfo: function(){
+			$("#score-container").html("");
+
+		}
+	,	calculateTotalScore:function(){
+			console.log("wanna get your total score?")
+			console.log(JSON.stringify(this.model));
+			var el = "#score-container";
+			var error_selector = "#score-container .error-container"
+			var status =  false;
+			var msg = "";
+			var user = new User({_id: this.model.get("uid")});
+			var entry_id = this.model.get("_id");
+			user.fetch({
+				success: function(user, res){
+					var entries = user.get('entries');
+					var entry = _.findWhere(entries, {_id: entry_id});
+					console.log(JSON.stringify(entry));
+					if(entry["data"] === undefined){
+						msg = "You have no Economic Citizenship data saved. Please enter all information for all categories and try again.";
+					}else{
+						console.log("fetched updated user information");
+						//check if all categories available
+						var expected_cats = EconCit.getCategoriesShallow();
+						var found_cats = Object.keys(entry["data"]);
+						console.log("expected: " + expected_cats.toString())
+						console.log("filled: " + found_cats.toString())
+						if(expected_cats.length == found_cats.length){
+							var score = EconCit.scoreEntry(entry["data"]);
+							msg = "YOUR ECONOMIC CITIZENSHIP SCORE IS: " + score + ".";
+							status = true;
+						}else{ 
+							var unfilled_cats = _.difference(expected_cats, found_cats);
+							console.log(unfilled_cats.toString())
+							msg = "Please enter information for the following categories and then try again: " + unfilled_cats.toString();
+						}
+					}
+					console.log(msg);
+					$(el).append(msg);
+				},
+				error: function(user, res){
+					msg = "There was a server error. Please try again later.";
+					console.log("ERROR fetching user: " + JSON.stringify(res));
+					$(el).append(msg);
+				}
+			});
 		}
 	,	afterRender:function(){
 			console.log(JSON.stringify(this.model));
@@ -443,7 +500,7 @@ the user's entry list, AUGMENTED with a 'uid' field that is the user's id
 			$('.tab-pane:first').addClass("active");
 		},
 		calculateTotalScore: function(){
-			var el = "#score_container";
+			var el = "#score-container";
 			var status =  false;
 			var msg = "";
 			this.model.fetch({
@@ -546,7 +603,7 @@ the user's entry list, AUGMENTED with a 'uid' field that is the user's id
 		}
 	});
 
-	//TODO: programmatically match CONFIG with Heroku enviro variables
+	//TODO: programmatically match CONFIG with Heroku enviro variables. NOPE: not possible in browser. 
 	var CONFIG = {};
 	var base_url = window.location.href;
 	//var base_url = "http://localhost:5000/";
