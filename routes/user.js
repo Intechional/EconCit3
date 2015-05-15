@@ -20,7 +20,7 @@ exports.getUser = function(req, res){
 		console.log("getting user: " + uid);
 		UserModel.findById(uid, function(err, foundUser){
 			if(!err){
-				console.log("found user: " + JSON.stringify(foundUser));
+				//console.log("found user: " + JSON.stringify(foundUser));
 				return res.send(foundUser);
 			}else{
 				console.log("ERROR: user not found in db after auth. Id: " + uid);
@@ -38,11 +38,16 @@ exports.getUser = function(req, res){
 exports.createEntry = function(req, res){
 	var uid = req.params.uid;
 	console.log("creating entry for user: " + uid);
+	console.log(JSON.stringify(req.body));
 	UserModel.findById(uid, function(err, foundUser){
 			if(!err){
 				//console.log("found user: " + JSON.stringify(foundUser));
 				//console.log("Entries before push: " + JSON.stringify(entries));
 				var new_entry = new EconCitEntryModel;
+				new_entry["name"] = req.body["name"];
+				new_entry["start_date"] = new Date(req.body["start_date"]);
+				new_entry["end_date"] = new Date(req.body["end_date"]);
+				console.log(JSON.stringify(new_entry));
 				foundUser.entries.push(new_entry);
 				//console.log("Entries after push: " + JSON.stringify(entries));
 				foundUser.save(function (err) {
@@ -121,7 +126,7 @@ exports.updateEntryData= function(req, res){
 	console.log("updating user: " + uid  +" for entry: " + entry_id);
 	UserModel.findById(uid, function(err, foundUser){
 		if(!err){
-			console.log("found user to update: " + JSON.stringify(foundUser));
+			//console.log("found user to update: " + JSON.stringify(foundUser));
 			console.log("req body: " + JSON.stringify(req.body));
 			var entries = foundUser["entries"]; 
 			console.log("entries: " + JSON.stringify(entries));

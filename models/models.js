@@ -5,8 +5,9 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var EconCitEntry = new Schema({
-		start: Date, 
-		end: Date,
+		name: {type:String, default: "Untitled Entry"},
+		start_date: Date, 
+		end_date: Date,
 		created: {type:Date, default: Date.now},
 		data: {type:Object, default: {}}
 	},

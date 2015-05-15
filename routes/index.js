@@ -82,8 +82,12 @@ This method uses passportjs to handle authorization and sessions.
 	});
 	
 	router.get('/users/:uid', isAuthenticated, UserRoutes.getUser);
-	router.get('/createEntry/:uid', isAuthenticated, UserRoutes.createEntry);
+	//router.get('/createEntry/:uid', isAuthenticated, UserRoutes.createEntry);
 	router.get('/getEntry/:uid/:entry_id', isAuthenticated, UserRoutes.getEntry);
+//try posting for createntry:
+
+
+router.post('/createEntry/:uid', isAuthenticated, UserRoutes.createEntry);
 
 /*This method currently  assumes only one entry per user, and only updates category info. 
 It needs to be generalized to handle updates to other entry attributes, choose a specific entry,

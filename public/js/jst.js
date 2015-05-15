@@ -48,15 +48,15 @@ window.JST['create_entry'] = _.template(
     <form class="form-inline">\
         <div class="form-group">\
             <label for="new_entry_name">Name</label>\
-            <input type="text" class="form-control" placeholder="Example Entry" id="new_entry_name" value="">\
+            <input type="text" class="form-control" placeholder="Untitled Entry" id="new-entry-name" value="Untitled Entry">\
         </div>\
         <div class="form-group">\
             <label>Start date:</label>\
-            <input type="date" class="form-control" id="start_date" value="">\
+            <input type="date" class="form-control" id="start-date" value="">\
         </div>\
         <div class="form-group">\
             <label>End date:</label>\
-            <input type="date" class="form-control" id="end_date" value="">\
+            <input type="date" class="form-control" id="end-date" value="">\
         </div>\
         <button class="btn btn-default" id="create-entry-button" class="btn btn-default">Create</button>\
     </form>\
@@ -72,14 +72,14 @@ window.JST['display_skeleton'] = _.template(
 );
 
 window.JST['entry_display'] = _.template(
-    '<li class="list-group-item"> <%=info%> <button class="center" id="edit-<%=entry_id%>" class="btn btn-default">Edit</button> </li>'
+    '<li class="list-group-item"> <p> <%=entry_name%>: from <%=start_date%> to <%=end_date%>. </p><button class="center" id="edit-<%=entry_id%>" class="btn btn-default">Edit</button> </li>'
 );
 
 /*This template is the skeleton for all the econ cit category 
 input forms. It must be in the dom before the tabs and inputs 
 are added.*/
 window.JST['econ_cit_input_skeleton'] = _.template(
-    '<div>You are editing Entry with id: <%= entry_id%> </div>\
+    '<div>You are editing <%= entry_name%>: From <%=start_date%> to <%=end_date%>. </div>\
     <div role="tabpanel">\
         <ul class="nav nav-tabs" role="tablist"></ul>\
     </div>\

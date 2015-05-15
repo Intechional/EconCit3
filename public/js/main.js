@@ -253,10 +253,12 @@ the user's entry list, AUGMENTED with a 'uid' field that is the user's id.
 		},
 		render: function(){
 			var entry_id = this.model.get("_id");
-			console.log("entry id: " + entry_id);
 			var uid = this.model.get("uid");
 			var info_string = JSON.stringify(this.model);
-			var entry_data = {"info":info_string, "entry_id": entry_id}
+			var entry_name = this.model.get("name");
+			var start_date = (new Date(this.model.get("start_date"))).toDateString();
+			var end_date = (new Date(this.model.get("end_date"))).toDateString();
+			var entry_data = {"entry_name": entry_name, "start_date": start_date, "end_date": end_date, "entry_id": entry_id}
 			var entry_display_template  = window.JST['entry_display'];
 			var html = entry_display_template(entry_data);
 			$("#entry-list").append(html);
@@ -308,15 +310,19 @@ to mess with collection views.
 			console.log("so you wanna make a new entry?");
 			var uid = this.model.get("_id")
 			var url = CONFIG.base_url + "createEntry/" + uid;
+			var name = $('#new-entry-name').val();
+			var start_date =  $('#start-date').val();
+			var end_date = $('#end-date').val();
+			var data = {"name" : name, "start_date": start_date, "end_date": end_date}
 			console.log(url);
 			$.ajax({
 				url: url, 
+				type: 'post',
+				data: data, 
 				success : function(data, status, jqXHR){
-					console.log(JSON.stringify(data));
 					var new_entry = data["data"];
-					console.log(JSON.stringify(new_entry));
 					var entry_id = new_entry["_id"];
-					app.editEntry(uid,entry_id );
+					app.editEntry(uid,entry_id);
 				},
 				error: function(jqXHR, status, errorThrown){
 					console.log("ERROR: " + JSON.stringify(jqXHR) + status + JSON.stringify(errorThrown));
@@ -371,8 +377,12 @@ the user's entry list, AUGMENTED with a 'uid' field that is the user's id
 			this.render(); 
 		}
 	,	render: function(){
+			var entry_name = this.model.get("name");
+			var start_date = (new Date(this.model.get("start_date"))).toDateString();
+			var end_date = (new Date(this.model.get("end_date"))).toDateString();
+			var entry_data = {"entry_name": entry_name, "start_date": start_date, "end_date": end_date}
 			var econ_cit_input_skeleton_html = window.JST['econ_cit_input_skeleton'];
-			$("#econ-cit-container").html(econ_cit_input_skeleton_html({entry_id: this.model.get("_id")})); //replace display view
+			$("#econ-cit-container").html(econ_cit_input_skeleton_html(entry_data)); //replace display view
 			$('#total-score-button').click(this.calculateTotalScore);
 			$('#clear-score-button').click(this.clearScoreInfo);
 		}
