@@ -31,7 +31,11 @@ exports.getUser = function(req, res){
 
 
 
-/* createEntry requires a uid to be available in the request body. 
+/* createEntry, meant to be used with POST, requires a uid parameter in the request, and 
+the following fields in the req body: name, start_date, end_date. If an invalid date string
+is used, then 'Invalid Date' will be saved in the database. The name is purely descriptive,
+up to the user, and not used to identify the entry. 
+
 * creates an empty {} and pushes it into the user's "entries" attribute
 * response sends the new entry as 'data' or error information
 */
