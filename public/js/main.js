@@ -455,112 +455,112 @@ the user's entry list, AUGMENTED with a 'uid' field that is the user's id
 		}
 	});
 
-	var UserView = Backbone.View.extend({
-		el: $('#user-home-container'),
-		events: {},
-		initialize : function(){
-			console.log("init user view");
-			//the following lines allow us to render category views after the user view is rendered. 
-			_.bindAll(this, 'render', 'calculateTotalScore', 'createEntry'); //keeps 'this' this in afterRender
-            this.render = _.wrap(this.render, function(render) {
-                render();
-                this.afterRender();
-            });
-			this.render(); 
-		},
-		render: function(){
-			//set up skeleton for econ cit entry inputs
-			var username = this.model.get("username");
-			var skeleton_template = window.JST['user_skeleton'];
-			$(this.el).html(skeleton_template({"username" : username}));
-			var econ_cit_input_skeleton_html = window.JST['econ_cit_input_skeleton'];
-			$("#econ-cit-container").append(econ_cit_input_skeleton_html);
-			$('#total-score-button').click(this.calculateTotalScore);
-			$('#logout-button').click(this.logout);
-			$('#create-entry-button-old').click(this.createEntry);//temporary
-		},
-		createEntry: function(){
-			console.log("so you wanna make a new entry?");
-			var uid = this.model.get("_id")
-			var url = CONFIG.base_url + "createEntry/" + uid;
-			$.ajax({
-				url: url, 
-				success : function(data, status, jqXHR){
-					console.log(JSON.stringify(data));
-				},
-				error: function(jqXHR, status, errorThrown){
-					console.log("ERROR: " + status);
-				}
-			});
-		},
-		afterRender: function(){
-			console.log("after render")
-			var user_model = this.model;
-			var cats_deep = EconCit.getCategoriesDeep();
-			var cat_names = EconCit.getCategoriesShallow();
-			console.log(JSON.stringify(cat_names));
-			_.each(cat_names, function(cat_name, index, list){
-				var cat = cats_deep[cat_name];
-				cat["name"] = cat_name; //make key a 'name' property of object
-				cat["user"] = user_model;//sends entire user model object to category view for saving info. Can we do this better?
-				//create new model from cat, which now also contains the user, and make a view:
-				var cat_model = new EconCitCategory(cat);
-				var cat_view = new EconCitCategoryView({model: cat_model});
-			});
-			$('.tab-pane:first').addClass("active");
-		},
-		calculateTotalScore: function(){
-			var el = "#score-container";
-			var status =  false;
-			var msg = "";
-			this.model.fetch({
-				success: function(user, res){
-					var econCitData = user.get("econCitData");
-					if(econCitData === undefined){
-						msg = "You have no Economic Citizenship data saved. Please enter all information for all categories and try again.";
-					}else{
-						console.log("fetched updated user information");
-						//check if all categories available
-						var expected_cats = EconCit.getCategoriesShallow();
-						var found_cats = Object.keys(econCitData);
-						console.log("expected: " + expected_cats.toString())
-						console.log("filled: " + found_cats.toString())
-						if(expected_cats.length == found_cats.length){
-							var score = EconCit.scoreEntry(econCitData);
-							msg = "YOUR ECONOMIC CITIZENSHIP SCORE IS: " + score + ".";
-							status = true;
-						}else{ 
-							var unfilled_cats = _.difference(expected_cats, found_cats);
-							console.log(unfilled_cats.toString())
-							msg = "Please enter information for the following categories and then try again: " + unfilled_cats.toString();
-						}
-					}
-					console.log(msg);
-					$(el).append(msg);
-				},
-				error: function(user, res){
-					msg = "There was a server error. Please try again later.";
-					console.log("ERROR fetching user: " + JSON.stringify(res));
-					$(el).append(msg);
-				}
-			});
-		},
-		logout : function(e){
-        	var url = CONFIG.base_url + "logout";
-			$.ajax({
-				url: url,
-				success: function(){
-					alert("You're logged out.");
-					app.navigate("", {trigger: true});
+	// var UserView = Backbone.View.extend({
+	// 	el: $('#user-home-container'),
+	// 	events: {},
+	// 	initialize : function(){
+	// 		console.log("init user view");
+	// 		//the following lines allow us to render category views after the user view is rendered. 
+	// 		_.bindAll(this, 'render', 'calculateTotalScore', 'createEntry'); //keeps 'this' this in afterRender
+ //            this.render = _.wrap(this.render, function(render) {
+ //                render();
+ //                this.afterRender();
+ //            });
+	// 		this.render(); 
+	// 	},
+	// 	render: function(){
+	// 		//set up skeleton for econ cit entry inputs
+	// 		var username = this.model.get("username");
+	// 		var skeleton_template = window.JST['user_skeleton'];
+	// 		$(this.el).html(skeleton_template({"username" : username}));
+	// 		var econ_cit_input_skeleton_html = window.JST['econ_cit_input_skeleton'];
+	// 		$("#econ-cit-container").append(econ_cit_input_skeleton_html);
+	// 		$('#total-score-button').click(this.calculateTotalScore);
+	// 		$('#logout-button').click(this.logout);
+	// 		$('#create-entry-button-old').click(this.createEntry);//temporary
+	// 	},
+	// 	createEntry: function(){
+	// 		console.log("so you wanna make a new entry?");
+	// 		var uid = this.model.get("_id")
+	// 		var url = CONFIG.base_url + "createEntry/" + uid;
+	// 		$.ajax({
+	// 			url: url, 
+	// 			success : function(data, status, jqXHR){
+	// 				console.log(JSON.stringify(data));
+	// 			},
+	// 			error: function(jqXHR, status, errorThrown){
+	// 				console.log("ERROR: " + status);
+	// 			}
+	// 		});
+	// 	},
+	// 	afterRender: function(){
+	// 		console.log("after render")
+	// 		var user_model = this.model;
+	// 		var cats_deep = EconCit.getCategoriesDeep();
+	// 		var cat_names = EconCit.getCategoriesShallow();
+	// 		console.log(JSON.stringify(cat_names));
+	// 		_.each(cat_names, function(cat_name, index, list){
+	// 			var cat = cats_deep[cat_name];
+	// 			cat["name"] = cat_name; //make key a 'name' property of object
+	// 			cat["user"] = user_model;//sends entire user model object to category view for saving info. Can we do this better?
+	// 			//create new model from cat, which now also contains the user, and make a view:
+	// 			var cat_model = new EconCitCategory(cat);
+	// 			var cat_view = new EconCitCategoryView({model: cat_model});
+	// 		});
+	// 		$('.tab-pane:first').addClass("active");
+	// 	},
+	// 	calculateTotalScore: function(){
+	// 		var el = "#score-container";
+	// 		var status =  false;
+	// 		var msg = "";
+	// 		this.model.fetch({
+	// 			success: function(user, res){
+	// 				var econCitData = user.get("econCitData");
+	// 				if(econCitData === undefined){
+	// 					msg = "You have no Economic Citizenship data saved. Please enter all information for all categories and try again.";
+	// 				}else{
+	// 					console.log("fetched updated user information");
+	// 					//check if all categories available
+	// 					var expected_cats = EconCit.getCategoriesShallow();
+	// 					var found_cats = Object.keys(econCitData);
+	// 					console.log("expected: " + expected_cats.toString())
+	// 					console.log("filled: " + found_cats.toString())
+	// 					if(expected_cats.length == found_cats.length){
+	// 						var score = EconCit.scoreEntry(econCitData);
+	// 						msg = "YOUR ECONOMIC CITIZENSHIP SCORE IS: " + score + ".";
+	// 						status = true;
+	// 					}else{ 
+	// 						var unfilled_cats = _.difference(expected_cats, found_cats);
+	// 						console.log(unfilled_cats.toString())
+	// 						msg = "Please enter information for the following categories and then try again: " + unfilled_cats.toString();
+	// 					}
+	// 				}
+	// 				console.log(msg);
+	// 				$(el).append(msg);
+	// 			},
+	// 			error: function(user, res){
+	// 				msg = "There was a server error. Please try again later.";
+	// 				console.log("ERROR fetching user: " + JSON.stringify(res));
+	// 				$(el).append(msg);
+	// 			}
+	// 		});
+	// 	},
+	// 	logout : function(e){
+ //        	var url = CONFIG.base_url + "logout";
+	// 		$.ajax({
+	// 			url: url,
+	// 			success: function(){
+	// 				alert("You're logged out.");
+	// 				app.navigate("", {trigger: true});
 					
-				},
-				error : function(){
-					alert("Please close your browser to logout.");
-					app.navigate("", {trigger: true});
-				}
-			});
-		}
-	});
+	// 			},
+	// 			error : function(){
+	// 				alert("Please close your browser to logout.");
+	// 				app.navigate("", {trigger: true});
+	// 			}
+	// 		});
+	// 	}
+	// });
 
 
 

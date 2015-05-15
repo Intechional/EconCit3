@@ -72,7 +72,7 @@ window.JST['display_skeleton'] = _.template(
 );
 
 window.JST['entry_display'] = _.template(
-    '<li class="list-group-item"> <p> <%=entry_name%>: from <%=start_date%> to <%=end_date%>. </p><button class="center" id="edit-<%=entry_id%>" class="btn btn-default">Edit</button> </li>'
+    '<li class="list-group-item"> <p> <%=entry_name%>: from <%=start_date%> to <%=end_date%>. </p><button class="center" id="edit-<%=entry_id%>" class="btn btn-default">Edit</button></li>'
 );
 
 /*This template is the skeleton for all the econ cit category 
