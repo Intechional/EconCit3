@@ -131,9 +131,9 @@ exports.updateEntryData= function(req, res){
 	UserModel.findById(uid, function(err, foundUser){
 		if(!err){
 			//console.log("found user to update: " + JSON.stringify(foundUser));
-			console.log("req body: " + JSON.stringify(req.body));
+			//console.log("req body: " + JSON.stringify(req.body));
 			var entries = foundUser["entries"]; 
-			console.log("entries: " + JSON.stringify(entries));
+			//console.log("entries: " + JSON.stringify(entries));
 			//findWhere might be better here
 			var oldEntry = _und.find(entries, function(e){return e["_id"] == entry_id})
 			var index = entries.indexOf(oldEntry);

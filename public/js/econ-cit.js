@@ -171,10 +171,29 @@
 	scales the subscore to match the weight. It assumes the sum of weights
 	across all categories is 1. 
 	*/
-	_scaleSubscore = function(subscore, weight){
+	var _scaleSubscore = function(subscore, weight){
 		var multiplier = weight * _total_raw_score;
 		var scaled_score = multiplier * subscore/5;
 		return scaled_score
+	}
+
+	var _getCountyGivingAverage = function(county){
+		//based on 'Giving Ratio' (percent AGI) from https://philanthropy.com/interactives/how-america-gives#search on June 2, 2015
+		var map = {	
+				"Alameda" : 2.1
+			, "Contra Costa" : 2.14
+			, "San Francisco" : 3.36
+			, "San Mateo" : 2.86
+			, "Santa Clara" : 2.97 
+			, "Other" : 2.79 //California State giving ratio
+
+		}
+		if(county in map){
+			return map[county] * .01; //make into percentage
+		}else{
+			console.log("ERROR: invalid county - " + county + " - in _getCountyGivingAverage function");
+			return map["Other"] * .01; 
+		}			
 	}
 
 
@@ -295,6 +314,7 @@
 			}
 		});
 
+
 		var CommunityEngagementCategory = new Category({
 			name: "community",
 			displayName: "Community Engagement",
@@ -308,13 +328,14 @@
 			instructions: "Tell us how many hours you have volunteered (you may volunteer at a church, school, organization, or help out neighbors) and any money you donate. Work with your coach to figure out your gross income.",
 			calculationFunction:function(inputs){
 				var subscore = 0;
-				var county_average= .04 //hardcoded
+				var county_average=_getCountyGivingAverage(inputs["county"]); //hardcoded
 				var donations = parseInt(inputs["donations_in_dollars"]);
 				var hours = parseInt(inputs["hours_volunteered"]);
 				var income = parseInt(inputs["gross_income"]) + 0.0;
 				if(income > 0){
 					var raw_score = (donations + 22.5 * hours)/income
 					console.log("community raw score:" + raw_score)
+					console.log("county avg: " + county_average)
 					var adjusted_score = raw_score/county_average;
 					console.log("community adjusted_score score:" + adjusted_score)
 					if(adjusted_score == 0){
